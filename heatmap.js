@@ -116,7 +116,7 @@ function renderHeatmap() {
     const kddiOrgs = getDisplayOrgs(orgData.kddi, 'kddi');
     const ctcOrgs = getDisplayOrgs(orgData.ctc, 'ctc');
 
-    // ヘッダー行
+    // ヘッダー行（2行に分ける：1行目は階層レベル、2行目は組織名）
     const headerRow = document.createElement('div');
     headerRow.className = 'heatmap-row';
 
@@ -127,24 +127,44 @@ function renderHeatmap() {
     headerRow.appendChild(cornerCell);
 
     // CTC組織名（列ヘッダー）
-    ctcOrgs.forEach(org => {
+    ctcOrgs.forEach((org, index) => {
         const cell = document.createElement('div');
         cell.className = 'heatmap-cell header col-header';
+
+        // 階層レベルに応じたスタイル設定
+        cell.dataset.level = org.level;
+        cell.classList.add(`level-${org.level}`);
+
+        // 親組織（子を持つ）の場合は太字と背景色を変更
+        if (org.hasChildren && org.isExpanded) {
+            cell.classList.add('parent-org');
+        }
 
         const indent = '　'.repeat(org.level);
         const toggle = org.hasChildren
             ? `<span class="expand-toggle" data-company="ctc" data-id="${org.id}">${org.isExpanded ? '−' : '+'}</span>`
             : '';
 
-        cell.innerHTML = `${indent}${toggle}${org.name}`;
-        cell.title = org.name;
+        // 親組織には(合計)ラベルを追加
+        const label = (org.hasChildren && org.isExpanded) ? '<span class="sum-label">(合計)</span>' : '';
+
+        cell.innerHTML = `${indent}${toggle}${org.name}${label}`;
+        cell.title = org.name + (org.hasChildren && org.isExpanded ? ' (下位階層の合計)' : '');
+
+        // 階層の境界線を追加（新しい親組織の開始位置）
+        if (index > 0 && org.level === 0) {
+            cell.style.borderLeft = '3px solid #666';
+        } else if (index > 0 && org.level < ctcOrgs[index - 1].level) {
+            cell.style.borderLeft = '2px solid #999';
+        }
+
         headerRow.appendChild(cell);
     });
 
     grid.appendChild(headerRow);
 
     // データ行
-    kddiOrgs.forEach(kddiOrg => {
+    kddiOrgs.forEach((kddiOrg, rowIndex) => {
         const row = document.createElement('div');
         row.className = 'heatmap-row';
 
@@ -152,18 +172,46 @@ function renderHeatmap() {
         const rowHeader = document.createElement('div');
         rowHeader.className = 'heatmap-cell row-header';
 
+        // 階層レベルに応じたスタイル設定
+        rowHeader.dataset.level = kddiOrg.level;
+        rowHeader.classList.add(`level-${kddiOrg.level}`);
+
+        // 親組織（子を持つ）の場合は太字
+        if (kddiOrg.hasChildren && kddiOrg.isExpanded) {
+            rowHeader.classList.add('parent-org');
+        }
+
         const indent = '　'.repeat(kddiOrg.level);
         const toggle = kddiOrg.hasChildren
             ? `<span class="expand-toggle" data-company="kddi" data-id="${kddiOrg.id}">${kddiOrg.isExpanded ? '−' : '+'}</span>`
             : '';
 
-        rowHeader.innerHTML = `${indent}${toggle}${kddiOrg.name}`;
+        // 親組織には(合計)ラベルを追加
+        const label = (kddiOrg.hasChildren && kddiOrg.isExpanded) ? ' <span class="sum-label">(合計)</span>' : '';
+
+        rowHeader.innerHTML = `${indent}${toggle}${kddiOrg.name}${label}`;
+
+        // 階層の境界線を追加
+        if (rowIndex > 0 && kddiOrg.level === 0) {
+            row.style.borderTop = '3px solid #666';
+        } else if (rowIndex > 0 && kddiOrg.level < kddiOrgs[rowIndex - 1].level) {
+            row.style.borderTop = '2px solid #999';
+        }
+
         row.appendChild(rowHeader);
 
         // データセル
-        ctcOrgs.forEach(ctcOrg => {
+        ctcOrgs.forEach((ctcOrg, colIndex) => {
             const cell = document.createElement('div');
             cell.className = 'heatmap-cell';
+
+            // 親組織の列には特別なスタイルを適用
+            if (ctcOrg.hasChildren && ctcOrg.isExpanded) {
+                cell.classList.add('parent-col');
+            }
+            if (kddiOrg.hasChildren && kddiOrg.isExpanded) {
+                cell.classList.add('parent-row');
+            }
 
             const count = calculateConnections(kddiOrg.node, ctcOrg.node);
             cell.style.backgroundColor = getHeatColor(count);
@@ -173,6 +221,7 @@ function renderHeatmap() {
             cell.dataset.kddiOrg = kddiOrg.name;
             cell.dataset.ctcOrg = ctcOrg.name;
             cell.dataset.count = count;
+            cell.dataset.level = `${kddiOrg.level}-${ctcOrg.level}`;
 
             // ホバーイベント
             cell.addEventListener('mouseenter', showTooltip);

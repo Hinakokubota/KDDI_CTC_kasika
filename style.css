@@ -437,6 +437,74 @@ body {
     margin-left: 20px;
 }
 
+/* 階層レベルごとの背景色 */
+.heatmap-cell.level-0 {
+    background: #e8f4f8 !important;
+}
+
+.heatmap-cell.row-header.level-0 {
+    background: #e8f4f8;
+}
+
+.heatmap-cell.level-1 {
+    background: #f0f8fc !important;
+}
+
+.heatmap-cell.row-header.level-1 {
+    background: #f0f8fc;
+}
+
+.heatmap-cell.level-2 {
+    background: #f8fcff !important;
+}
+
+.heatmap-cell.row-header.level-2 {
+    background: #f8fcff;
+}
+
+.heatmap-cell.level-3 {
+    background: #ffffff !important;
+}
+
+.heatmap-cell.row-header.level-3 {
+    background: #ffffff;
+}
+
+/* 親組織（子を持つ組織）のスタイル */
+.heatmap-cell.parent-org {
+    font-weight: 700;
+    background: #d9edf7 !important;
+}
+
+.heatmap-cell.row-header.parent-org {
+    background: #d9edf7;
+}
+
+/* 合計ラベル */
+.sum-label {
+    display: inline-block;
+    font-size: 10px;
+    color: #666;
+    margin-left: 4px;
+    font-weight: normal;
+}
+
+.col-header .sum-label {
+    writing-mode: horizontal-tb;
+    display: block;
+    margin-left: 0;
+    margin-top: 3px;
+}
+
+/* 親組織の列/行のデータセル */
+.heatmap-cell.parent-col {
+    border-left: 2px solid #bbb;
+}
+
+.heatmap-cell.parent-row {
+    border-top: 2px solid #bbb;
+}
+
 /* ツールチップ */
 .heatmap-tooltip {
     position: fixed;
