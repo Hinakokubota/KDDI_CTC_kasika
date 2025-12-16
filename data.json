@@ -221,37 +221,6 @@
             ]
           }
         ]
-      },
-      {
-        "id": "solution-biz",
-        "name": "ソリューションビジネスグループ",
-        "type": "business-group",
-        "children": [
-          {
-            "id": "sales-dept-a",
-            "name": "営業部門A",
-            "type": "department",
-            "children": [
-              {
-                "id": "sales-a-section",
-                "name": "営業課",
-                "type": "section",
-                "children": [
-                  {
-                    "id": "yamamoto-yo",
-                    "name": "山本 洋",
-                    "type": "person"
-                  },
-                  {
-                    "id": "yoshihashi",
-                    "name": "吉橋",
-                    "type": "person"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
       }
     ]
   },
@@ -266,19 +235,11 @@
     },
     {
       "kddi": "arai-ma",
-      "ctc": "yoshihashi"
-    },
-    {
-      "kddi": "arai-ma",
       "ctc": "ikeda-aa"
     },
     {
       "kddi": "shiohara-ma",
       "ctc": "tanaka-ma"
-    },
-    {
-      "kddi": "miyakawa-ki",
-      "ctc": "yamamoto-yo"
     },
     {
       "kddi": "sunagawa-ichi",

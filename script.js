@@ -2,7 +2,7 @@
 let orgData = null;
 let expandedNodes = new Set();
 let highlightedNodes = new Set();
-let currentView = 'full'; // 現在のビュー: 'kddi', 'ctc', 'full'
+let currentView = 'kddi'; // 現在のビュー: 'kddi', 'ctc'
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -157,7 +157,6 @@ function setupEventListeners() {
     // ビュー切り替えボタン
     document.getElementById('kddi-view-btn').addEventListener('click', () => switchView('kddi'));
     document.getElementById('ctc-view-btn').addEventListener('click', () => switchView('ctc'));
-    document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
 
     // スクロールイベントでコネクタ再描画
     const kddTree = document.getElementById('kddi-tree');
@@ -409,10 +408,14 @@ function drawLine(fromElement, toElement, svg) {
     const x2 = toRect.left - svgRect.left;
     const y2 = toRect.top + toRect.height / 2 - svgRect.top;
 
-    const midX = (x1 + x2) / 2;
+    // 制御点を調整して、より短く直線的な線にする
+    const distance = Math.abs(x2 - x1);
+    const controlOffset = distance * 0.2; // 20%の位置に制御点を配置
+    const cp1x = x1 + controlOffset;
+    const cp2x = x2 - controlOffset;
 
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const d = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+    const d = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
     path.setAttribute('d', d);
     path.setAttribute('class', 'connector-line');
     path.setAttribute('marker-end', 'url(#arrowhead)');
@@ -432,24 +435,10 @@ function switchView(view) {
     document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`${view}-view-btn`).classList.add('active');
 
-    const kddPanel = document.querySelector('.kddi-panel');
-    const ctcPanel = document.querySelector('.ctc-panel');
     const container = document.querySelector('.org-container');
 
-    // ビューに応じた表示切り替え
-    if (view === 'kddi') {
-        container.style.gridTemplateColumns = '2fr 1fr';
-        kddPanel.style.display = 'block';
-        ctcPanel.style.display = 'block';
-    } else if (view === 'ctc') {
-        container.style.gridTemplateColumns = '1fr 2fr';
-        kddPanel.style.display = 'block';
-        ctcPanel.style.display = 'block';
-    } else {
-        container.style.gridTemplateColumns = '1fr 1fr';
-        kddPanel.style.display = 'block';
-        ctcPanel.style.display = 'block';
-    }
+    // 画面分割は常に1fr 1frで中央分割
+    container.style.gridTemplateColumns = '1fr 1fr';
 
     // ツリー再描画（ハイライトを解除するため）
     renderTree('kddi', orgData.kddi);
