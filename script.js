@@ -66,7 +66,7 @@ function renderTree(company, data) {
     rootDiv.innerHTML = `
         <div class="node-content headquarters" data-id="${company}-root">
             <div class="node-icon"></div>
-            <div class="node-label">${data.name} Headquarters</div>
+            <div class="node-label">${data.name}</div>
         </div>
     `;
     container.appendChild(rootDiv);
