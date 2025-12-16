@@ -1,0 +1,288 @@
+{
+  "kddi": {
+    "name": "KDDI",
+    "children": [
+      {
+        "id": "tech-hq",
+        "name": "技術統括本部",
+        "type": "headquarters",
+        "children": [
+          {
+            "id": "network-tech",
+            "name": "ネットワーク技術本部",
+            "type": "department",
+            "children": [
+              {
+                "id": "network-dept",
+                "name": "ネットワーク部門",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "ishikawa-sho",
+                    "name": "石川 祥",
+                    "type": "person"
+                  },
+                  {
+                    "id": "arai-ma",
+                    "name": "新井 ま",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "advanced-tech",
+            "name": "先端技術企画本部",
+            "type": "department",
+            "children": [
+              {
+                "id": "advanced-planning",
+                "name": "先端技術企画部",
+                "type": "section"
+              }
+            ]
+          },
+          {
+            "id": "app-dept",
+            "name": "運用本部",
+            "type": "department",
+            "children": [
+              {
+                "id": "app-planning",
+                "name": "運用企画部",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "shiohara-ma",
+                    "name": "塩原 ま",
+                    "type": "person"
+                  }
+                ]
+              },
+              {
+                "id": "app-enterprise",
+                "name": "運用企画部",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "sunagawa-ichi",
+                    "name": "砂川 一",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "corporate-hq",
+        "name": "コーポレート統括本部",
+        "type": "headquarters",
+        "children": [
+          {
+            "id": "sustainability",
+            "name": "サステナビリティ経営推進本部",
+            "type": "department",
+            "children": [
+              {
+                "id": "sustainability-planning",
+                "name": "サステナビリティ企画部",
+                "type": "section"
+              },
+              {
+                "id": "sustainability-promotion",
+                "name": "サステナビリティ推進担当部",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "chiba-ha",
+                    "name": "千葉 は",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "management",
+            "name": "経営管理本部",
+            "type": "department",
+            "children": [
+              {
+                "id": "management-dept",
+                "name": "経営管理部",
+                "type": "section"
+              },
+              {
+                "id": "finance-dept",
+                "name": "財務・財経部",
+                "type": "section"
+              },
+              {
+                "id": "ir-dept",
+                "name": "IR部",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "miyakawa-ki",
+                    "name": "宮川 き",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ctc": {
+    "name": "CTC",
+    "children": [
+      {
+        "id": "info-comm-2",
+        "name": "情報通信第2本部",
+        "type": "headquarters",
+        "children": [
+          {
+            "id": "carrier-sales-1",
+            "name": "通信キャリア営業1部",
+            "type": "department",
+            "children": [
+              {
+                "id": "system-sales-1-1",
+                "name": "システム営業第1課",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "ikeda-aa",
+                    "name": "池田 AA",
+                    "type": "person"
+                  }
+                ]
+              },
+              {
+                "id": "system-sales-1-2",
+                "name": "システム営業第2課",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "tanaka-ma",
+                    "name": "田中 雅",
+                    "type": "person"
+                  }
+                ]
+              },
+              {
+                "id": "system-sales-1-3",
+                "name": "システム営業第3課",
+                "type": "section"
+              }
+            ]
+          },
+          {
+            "id": "carrier-sales-2",
+            "name": "通信キャリア営業2部",
+            "type": "department",
+            "children": [
+              {
+                "id": "system-sales-2-1",
+                "name": "システム営業第1課",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "furukawa-aa",
+                    "name": "古川 AA",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "carrier-sales-3",
+            "name": "通信キャリア営業第3部",
+            "type": "department",
+            "children": [
+              {
+                "id": "system-sales-3-1",
+                "name": "システム営業第1課",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "oshima-aa",
+                    "name": "大島 AA",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "solution-biz",
+        "name": "ソリューションビジネスグループ",
+        "type": "business-group",
+        "children": [
+          {
+            "id": "sales-dept-a",
+            "name": "営業部門A",
+            "type": "department",
+            "children": [
+              {
+                "id": "sales-a-section",
+                "name": "営業課",
+                "type": "section",
+                "children": [
+                  {
+                    "id": "yamamoto-yo",
+                    "name": "山本 洋",
+                    "type": "person"
+                  },
+                  {
+                    "id": "yoshihashi",
+                    "name": "吉橋",
+                    "type": "person"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "correlations": [
+    {
+      "kddi": "ishikawa-sho",
+      "ctc": "oshima-aa"
+    },
+    {
+      "kddi": "ishikawa-sho",
+      "ctc": "ikeda-aa"
+    },
+    {
+      "kddi": "arai-ma",
+      "ctc": "yoshihashi"
+    },
+    {
+      "kddi": "arai-ma",
+      "ctc": "ikeda-aa"
+    },
+    {
+      "kddi": "shiohara-ma",
+      "ctc": "tanaka-ma"
+    },
+    {
+      "kddi": "miyakawa-ki",
+      "ctc": "yamamoto-yo"
+    },
+    {
+      "kddi": "sunagawa-ichi",
+      "ctc": "furukawa-aa"
+    }
+  ]
+}

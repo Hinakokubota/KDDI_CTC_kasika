@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDDI-CTC Organizational Correlation Viewer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダーエリア: 検索・フィルタリング機能 -->
+        <header class="header">
+            <h1>KDDI-CTC Organizational Correlation Viewer</h1>
+            <div class="search-controls">
+                <div class="control-group">
+                    <label for="company-select">Company:</label>
+                    <select id="company-select">
+                        <option value="KDDI">KDDI</option>
+                        <option value="CTC">CTC</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="scope-select">Scope:</label>
+                    <select id="scope-select">
+                        <option value="department">Department</option>
+                        <option value="person">Person</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <input type="text" id="keyword-input" placeholder="Search keyword...">
+                </div>
+
+                <button id="search-button" class="search-btn">Search</button>
+
+                <div class="view-toggle">
+                    <button id="kddi-view-btn" class="view-btn active">KDDI View</button>
+                    <button id="ctc-view-btn" class="view-btn">CTC View</button>
+                    <button id="full-view-btn" class="view-btn">Full View</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインエリア: 組織図表示 -->
+        <main class="main-area">
+            <div class="org-container">
+                <!-- 左ペイン: KDDI組織図 -->
+                <div class="org-panel kddi-panel">
+                    <div class="panel-header">
+                        <h2>KDDI <span class="default-note">(Default: Headquarters)</span></h2>
+                    </div>
+                    <div id="kddi-tree" class="org-tree"></div>
+                </div>
+
+                <!-- 中央: コネクタ線描画エリア -->
+                <svg id="connector-svg" class="connector-layer">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2" />
+                        </marker>
+                    </defs>
+                </svg>
+
+                <!-- 右ペイン: CTC組織図 -->
+                <div class="org-panel ctc-panel">
+                    <div class="panel-header">
+                        <h2>CTC <span class="default-note">(Default: Department)</span></h2>
+                    </div>
+                    <div id="ctc-tree" class="org-tree"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
