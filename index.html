@@ -59,6 +59,10 @@
                                 refX="9" refY="3.5" orient="auto">
                             <polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2" />
                         </marker>
+                        <marker id="arrowhead-reverse" markerWidth="10" markerHeight="7"
+                                refX="1" refY="3.5" orient="auto">
+                            <polygon points="10 0, 0 3.5, 10 7" fill="#4A90E2" />
+                        </marker>
                     </defs>
                 </svg>
 
@@ -71,8 +75,42 @@
                 </div>
             </div>
         </main>
+
+        <!-- ヒートマップエリア -->
+        <section class="heatmap-section">
+            <h2 class="heatmap-title">KDDI・CTC 組織相関ヒートマップ</h2>
+            <div class="heatmap-controls">
+                <div class="legend">
+                    <span class="legend-label">接続件数:</span>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #f0f0f0;"></span>
+                        <span>0件</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #cfe2f3;"></span>
+                        <span>1-2件</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #6fa8dc;"></span>
+                        <span>3-5件</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #3c78d8;"></span>
+                        <span>6-10件</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #1155cc;"></span>
+                        <span>11件以上</span>
+                    </div>
+                </div>
+            </div>
+            <div class="heatmap-container">
+                <div id="heatmap-grid"></div>
+            </div>
+        </section>
     </div>
 
     <script src="script.js"></script>
+    <script src="heatmap.js"></script>
 </body>
 </html>

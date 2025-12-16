@@ -39,6 +39,9 @@ function initializeApp() {
 
     // コネクタ線描画
     setTimeout(() => drawConnectors(), 100);
+
+    // ヒートマップ初期化
+    setTimeout(() => initializeHeatmap(), 150);
 }
 
 // 指定レベルまで展開

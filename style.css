@@ -298,6 +298,162 @@ body {
     font-size: 18px;
 }
 
+/* ヒートマップセクション */
+.heatmap-section {
+    background: white;
+    margin: 30px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.heatmap-title {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.heatmap-controls {
+    margin-bottom: 20px;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.legend-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.legend-color {
+    width: 30px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+.heatmap-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 800px;
+}
+
+#heatmap-grid {
+    display: table;
+    border-collapse: collapse;
+    min-width: 100%;
+}
+
+.heatmap-row {
+    display: table-row;
+}
+
+.heatmap-cell {
+    display: table-cell;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: center;
+    min-width: 80px;
+    font-size: 13px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.heatmap-cell.header {
+    background: #f5f5f5;
+    font-weight: 600;
+    position: sticky;
+    z-index: 10;
+}
+
+.heatmap-cell.row-header {
+    background: #f5f5f5;
+    text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    min-width: 200px;
+}
+
+.heatmap-cell.corner {
+    z-index: 15;
+}
+
+.heatmap-cell.col-header {
+    top: 0;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    padding: 12px 8px;
+    min-width: 60px;
+}
+
+.heatmap-cell:not(.header):not(.row-header):hover {
+    outline: 2px solid #4A90E2;
+    cursor: pointer;
+    transform: scale(1.05);
+    z-index: 20;
+}
+
+.expand-toggle {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 14px;
+    text-align: center;
+    background: #4A90E2;
+    color: white;
+    border-radius: 3px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.expand-toggle:hover {
+    background: #357ABD;
+}
+
+.org-indent {
+    margin-left: 20px;
+}
+
+/* ツールチップ */
+.heatmap-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.heatmap-tooltip .org-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.heatmap-tooltip .count {
+    color: #4A90E2;
+    font-weight: 600;
+}
+
 /* レスポンシブ */
 @media (max-width: 1200px) {
     .org-container {
