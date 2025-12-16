@@ -130,7 +130,13 @@ function renderHeatmap() {
     ctcOrgs.forEach(org => {
         const cell = document.createElement('div');
         cell.className = 'heatmap-cell header col-header';
-        cell.textContent = org.name;
+
+        const indent = '　'.repeat(org.level);
+        const toggle = org.hasChildren
+            ? `<span class="expand-toggle" data-company="ctc" data-id="${org.id}">${org.isExpanded ? '−' : '+'}</span>`
+            : '';
+
+        cell.innerHTML = `${indent}${toggle}${org.name}`;
         cell.title = org.name;
         headerRow.appendChild(cell);
     });

@@ -377,6 +377,7 @@ body {
     font-weight: 600;
     position: sticky;
     z-index: 10;
+    color: #000;
 }
 
 .heatmap-cell.row-header {
@@ -424,6 +425,12 @@ body {
 
 .expand-toggle:hover {
     background: #357ABD;
+}
+
+.col-header .expand-toggle {
+    writing-mode: horizontal-tb;
+    margin-right: 0;
+    margin-bottom: 5px;
 }
 
 .org-indent {
