@@ -358,7 +358,17 @@ function findVisibleParentNode(nodeId, company) {
 // コネクタ線描画
 function drawConnectors() {
     const svg = document.getElementById('connector-svg');
-    svg.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2" /></marker></defs>';
+    // 通常の矢印（右向き）と逆向きの矢印（左向き）の両方を定義
+    svg.innerHTML = `
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2" />
+            </marker>
+            <marker id="arrowhead-reverse" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
+                <polygon points="10 0, 0 3.5, 10 7" fill="#4A90E2" />
+            </marker>
+        </defs>
+    `;
 
     const correlations = orgData.correlations || [];
 
@@ -384,21 +394,16 @@ function drawConnectors() {
             const ctcElement = document.querySelector(`[data-id="${ctcVisibleId}"]`);
 
             if (kddiElement && ctcElement) {
-                // ビューによって矢印の向きを変更
-                if (currentView === 'ctc') {
-                    // CTC View: CTCからKDDIへ
-                    drawLine(ctcElement, kddiElement, svg);
-                } else {
-                    // KDDI View / Full View: KDDIからCTCへ
-                    drawLine(kddiElement, ctcElement, svg);
-                }
+                // 常にKDDIからCTCへの線を描画し、ビューによって矢印の向きを変更
+                const reverseArrow = currentView === 'ctc';
+                drawLine(kddiElement, ctcElement, svg, reverseArrow);
             }
         }
     });
 }
 
 // 線描画
-function drawLine(fromElement, toElement, svg) {
+function drawLine(fromElement, toElement, svg, reverse = false) {
     const fromRect = fromElement.getBoundingClientRect();
     const toRect = toElement.getBoundingClientRect();
     const svgRect = svg.getBoundingClientRect();
@@ -418,7 +423,15 @@ function drawLine(fromElement, toElement, svg) {
     const d = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
     path.setAttribute('d', d);
     path.setAttribute('class', 'connector-line');
-    path.setAttribute('marker-end', 'url(#arrowhead)');
+
+    // 矢印の向きを制御
+    if (reverse) {
+        // CTC View: 始点（KDDI側）に逆向きの矢印を配置
+        path.setAttribute('marker-start', 'url(#arrowhead-reverse)');
+    } else {
+        // KDDI View: 終点（CTC側）に通常の矢印を配置
+        path.setAttribute('marker-end', 'url(#arrowhead)');
+    }
 
     svg.appendChild(path);
 }
