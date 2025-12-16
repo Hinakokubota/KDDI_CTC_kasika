@@ -158,6 +158,18 @@ function setupEventListeners() {
     document.getElementById('ctc-view-btn').addEventListener('click', () => switchView('ctc'));
     document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
 
+    // スクロールイベントでコネクタ再描画
+    const kddTree = document.getElementById('kddi-tree');
+    const ctcTree = document.getElementById('ctc-tree');
+
+    kddTree.parentElement.addEventListener('scroll', () => {
+        drawConnectors();
+    });
+
+    ctcTree.parentElement.addEventListener('scroll', () => {
+        drawConnectors();
+    });
+
     // ウィンドウリサイズ時にコネクタ再描画
     window.addEventListener('resize', () => {
         setTimeout(() => drawConnectors(), 100);
@@ -206,7 +218,7 @@ function performSearch() {
     scrollToNode(searchResults[0].nodeId);
 }
 
-// ノード検索
+// ノード検索（階層が開いていなくても検索可能）
 function searchNodes(company, scope, keyword) {
     const results = [];
     const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
@@ -225,6 +237,7 @@ function searchNodes(company, scope, keyword) {
                 });
             }
 
+            // 階層が開いていなくても再帰的に検索
             if (node.children) {
                 search(node.children, prefix);
             }
@@ -272,13 +285,11 @@ function expandCorrelatedNodes(nodeId, searchCompany) {
 // 担当者レベルまで展開（CTC側）
 function expandToPersonLevel(nodeId) {
     expandedNodes.add(nodeId);
-    // すでにexpandPathToNodeで展開済み
 }
 
 // 部レベルまで展開（KDDI側）
 function expandToDepartmentLevel(nodeId) {
     expandedNodes.add(nodeId);
-    // 親ノードまで展開するが、担当者は開かない
 }
 
 // ノードにスクロール
@@ -287,6 +298,53 @@ function scrollToNode(nodeId) {
     if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+}
+
+// 親ノードを取得（個人が表示されていない場合）
+function findVisibleParentNode(nodeId, company) {
+    // ノードIDからパスを分解
+    const parts = nodeId.split('-').slice(1); // 'kddi-' or 'ctc-' を除く
+
+    // データから該当ノードとその親を探す
+    const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
+
+    function findNodeAndParents(nodes, targetId, parents = []) {
+        for (let node of nodes) {
+            if (node.id === targetId) {
+                return parents;
+            }
+            if (node.children) {
+                const result = findNodeAndParents(node.children, targetId, [...parents, node]);
+                if (result) return result;
+            }
+        }
+        return null;
+    }
+
+    const targetId = parts.join('-');
+
+    // 個人ノードが表示されているか確認
+    const element = document.querySelector(`[data-id="${nodeId}"]`);
+    if (element && !element.closest('.node-children.collapsed')) {
+        return nodeId;
+    }
+
+    // 表示されていない場合、親ノードを探す
+    const parents = findNodeAndParents(data.children, targetId);
+    if (!parents || parents.length === 0) {
+        return null;
+    }
+
+    // 親ノードを逆順にチェック（最も近い親から）
+    for (let i = parents.length - 1; i >= 0; i--) {
+        const parentId = `${company}-${parents[i].id}`;
+        const parentElement = document.querySelector(`[data-id="${parentId}"]`);
+        if (parentElement && !parentElement.closest('.node-children.collapsed')) {
+            return parentId;
+        }
+    }
+
+    return `${company}-root`;
 }
 
 // コネクタ線描画
@@ -300,15 +358,17 @@ function drawConnectors() {
         const kddiNodeId = `kddi-${corr.kddi}`;
         const ctcNodeId = `ctc-${corr.ctc}`;
 
-        const kddiElement = document.querySelector(`[data-id="${kddiNodeId}"]`);
-        const ctcElement = document.querySelector(`[data-id="${ctcNodeId}"]`);
+        // 表示されているノード（または親ノード）を取得
+        const kddiVisibleId = findVisibleParentNode(kddiNodeId, 'kddi');
+        const ctcVisibleId = findVisibleParentNode(ctcNodeId, 'ctc');
 
-        // 両方のノードが表示されている場合のみ線を描画
-        if (kddiElement && ctcElement &&
-            !kddiElement.closest('.node-children.collapsed') &&
-            !ctcElement.closest('.node-children.collapsed')) {
+        if (kddiVisibleId && ctcVisibleId) {
+            const kddiElement = document.querySelector(`[data-id="${kddiVisibleId}"]`);
+            const ctcElement = document.querySelector(`[data-id="${ctcVisibleId}"]`);
 
-            drawLine(kddiElement, ctcElement, svg);
+            if (kddiElement && ctcElement) {
+                drawLine(kddiElement, ctcElement, svg);
+            }
         }
     });
 }
@@ -337,6 +397,9 @@ function drawLine(fromElement, toElement, svg) {
 
 // ビュー切り替え
 function switchView(view) {
+    // ハイライトをクリア
+    highlightedNodes.clear();
+
     // ボタンのアクティブ状態更新
     document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`${view}-view-btn`).classList.add('active');
@@ -359,6 +422,10 @@ function switchView(view) {
         kddPanel.style.display = 'block';
         ctcPanel.style.display = 'block';
     }
+
+    // ツリー再描画（ハイライトを解除するため）
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
 
     setTimeout(() => drawConnectors(), 100);
 }

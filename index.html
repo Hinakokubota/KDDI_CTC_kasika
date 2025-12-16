@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KDDI-CTC Organizational Correlation Viewer</title>
+    <title>KDDI-CTC 組織構造</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <!-- ヘッダーエリア: 検索・フィルタリング機能 -->
         <header class="header">
-            <h1>KDDI-CTC Organizational Correlation Viewer</h1>
+            <h1>KDDI-CTC 組織構造</h1>
             <div class="search-controls">
                 <div class="control-group">
-                    <label for="company-select">Company:</label>
+                    <label for="company-select">会社名:</label>
                     <select id="company-select">
                         <option value="KDDI">KDDI</option>
                         <option value="CTC">CTC</option>
@@ -21,18 +21,18 @@
                 </div>
 
                 <div class="control-group">
-                    <label for="scope-select">Scope:</label>
+                    <label for="scope-select">検索対象:</label>
                     <select id="scope-select">
-                        <option value="department">Department</option>
-                        <option value="person">Person</option>
+                        <option value="department">部署</option>
+                        <option value="person">個人名</option>
                     </select>
                 </div>
 
                 <div class="control-group">
-                    <input type="text" id="keyword-input" placeholder="Search keyword...">
+                    <input type="text" id="keyword-input" placeholder="キーワードを入力...">
                 </div>
 
-                <button id="search-button" class="search-btn">Search</button>
+                <button id="search-button" class="search-btn">検索</button>
 
                 <div class="view-toggle">
                     <button id="kddi-view-btn" class="view-btn active">KDDI View</button>
