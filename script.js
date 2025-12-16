@@ -251,15 +251,42 @@ function searchNodes(company, scope, keyword) {
     return results;
 }
 
+// ノードまでのパスを取得
+function getNodePath(nodeId, company) {
+    const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
+    const targetId = nodeId.split('-').slice(1).join('-'); // 'kddi-' or 'ctc-' を除く
+    const path = [];
+
+    function findPath(nodes, target, currentPath = []) {
+        for (let node of nodes) {
+            const fullId = `${company}-${node.id}`;
+            const newPath = [...currentPath, fullId];
+
+            if (node.id === target) {
+                path.push(...newPath);
+                return true;
+            }
+
+            if (node.children && findPath(node.children, target, newPath)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    findPath(data.children, targetId);
+    return path;
+}
+
 // ノードまでのパスを展開
 function expandPathToNode(nodeId, company) {
-    const parts = nodeId.split('-');
-    let currentPath = company;
+    // ノードまでのパスを取得
+    const path = getNodePath(nodeId, company);
 
-    for (let i = 1; i < parts.length; i++) {
-        currentPath += '-' + parts[i];
-        expandedNodes.add(currentPath);
-    }
+    // パス上の全てのノードを展開
+    path.forEach(id => {
+        expandedNodes.add(id);
+    });
 }
 
 // 相関ノードの自動展開
@@ -294,10 +321,38 @@ function expandToDepartmentLevel(nodeId) {
 
 // ノードにスクロール
 function scrollToNode(nodeId) {
-    const element = document.querySelector(`[data-id="${nodeId}"]`);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    // 少し遅延させてDOMの更新を待つ
+    setTimeout(() => {
+        const element = document.querySelector(`[data-id="${nodeId}"]`);
+        if (element) {
+            // 親コンテナを取得
+            const parentContainer = element.closest('.org-panel');
+            if (parentContainer) {
+                // 要素の位置を計算
+                const elementRect = element.getBoundingClientRect();
+                const containerRect = parentContainer.getBoundingClientRect();
+
+                // コンテナ内での相対位置を計算
+                const relativeTop = element.offsetTop - parentContainer.offsetTop;
+
+                // コンテナの中央に配置されるようにスクロール
+                const scrollTop = relativeTop - (containerRect.height / 2) + (elementRect.height / 2);
+
+                // スムーズにスクロール
+                parentContainer.scrollTo({
+                    top: scrollTop,
+                    behavior: 'smooth'
+                });
+
+                // ハイライトをより目立たせるため、一時的にアニメーション効果を追加
+                element.style.transition = 'background-color 0.5s';
+                element.style.backgroundColor = '#fffacd';
+                setTimeout(() => {
+                    element.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+    }, 200); // DOM更新後にスクロール
 }
 
 // 個人ノードが表示されているか確認
