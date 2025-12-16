@@ -2,6 +2,7 @@
 let orgData = null;
 let expandedNodes = new Set();
 let highlightedNodes = new Set();
+let currentView = 'full'; // 現在のビュー: 'kddi', 'ctc', 'full'
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -300,6 +301,15 @@ function scrollToNode(nodeId) {
     }
 }
 
+// 個人ノードが表示されているか確認
+function isPersonNodeVisible(nodeId) {
+    const element = document.querySelector(`[data-id="${nodeId}"]`);
+    if (!element) return false;
+
+    // 要素が存在し、折りたたまれた親要素の中にない場合、表示されている
+    return !element.closest('.node-children.collapsed');
+}
+
 // 親ノードを取得（個人が表示されていない場合）
 function findVisibleParentNode(nodeId, company) {
     // ノードIDからパスを分解
@@ -324,8 +334,7 @@ function findVisibleParentNode(nodeId, company) {
     const targetId = parts.join('-');
 
     // 個人ノードが表示されているか確認
-    const element = document.querySelector(`[data-id="${nodeId}"]`);
-    if (element && !element.closest('.node-children.collapsed')) {
+    if (isPersonNodeVisible(nodeId)) {
         return nodeId;
     }
 
@@ -358,6 +367,15 @@ function drawConnectors() {
         const kddiNodeId = `kddi-${corr.kddi}`;
         const ctcNodeId = `ctc-${corr.ctc}`;
 
+        // 個人ノードが表示されているか確認
+        const kddiPersonVisible = isPersonNodeVisible(kddiNodeId);
+        const ctcPersonVisible = isPersonNodeVisible(ctcNodeId);
+
+        // 少なくとも片方の個人が表示されている場合のみコネクタを描画
+        if (!kddiPersonVisible && !ctcPersonVisible) {
+            return; // 両方とも個人が表示されていない場合は描画しない
+        }
+
         // 表示されているノード（または親ノード）を取得
         const kddiVisibleId = findVisibleParentNode(kddiNodeId, 'kddi');
         const ctcVisibleId = findVisibleParentNode(ctcNodeId, 'ctc');
@@ -367,7 +385,14 @@ function drawConnectors() {
             const ctcElement = document.querySelector(`[data-id="${ctcVisibleId}"]`);
 
             if (kddiElement && ctcElement) {
-                drawLine(kddiElement, ctcElement, svg);
+                // ビューによって矢印の向きを変更
+                if (currentView === 'ctc') {
+                    // CTC View: CTCからKDDIへ
+                    drawLine(ctcElement, kddiElement, svg);
+                } else {
+                    // KDDI View / Full View: KDDIからCTCへ
+                    drawLine(kddiElement, ctcElement, svg);
+                }
             }
         }
     });
@@ -397,6 +422,9 @@ function drawLine(fromElement, toElement, svg) {
 
 // ビュー切り替え
 function switchView(view) {
+    // 現在のビューを保存
+    currentView = view;
+
     // ハイライトをクリア
     highlightedNodes.clear();
 
