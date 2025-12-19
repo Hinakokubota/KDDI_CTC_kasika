@@ -93,6 +93,7 @@ function renderNode(node, parentElement, company) {
 
     // 検索フィルターが有効な場合、フィルタードノードに含まれていないノードは表示しない
     if (searchActive && filteredNodes && !filteredNodes.has(nodeId)) {
+        console.log('非表示:', nodeId);
         return;
     }
 
@@ -226,6 +227,10 @@ function performSearch() {
         // 対向組織の相関ノードも追加
         addCorrelatedNodesToFilter(result.nodeId, company.toLowerCase());
     });
+
+    console.log('検索結果:', searchResults.length, '件');
+    console.log('フィルタードノード数:', filteredNodes.size);
+    console.log('searchActive:', searchActive);
 
     // ツリー再描画
     renderTree('kddi', orgData.kddi);
