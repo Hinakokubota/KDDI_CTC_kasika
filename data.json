@@ -20,12 +20,16 @@
                   {
                     "id": "ishikawa-sho",
                     "name": "石川 祥",
-                    "type": "person"
+                    "type": "person",
+                    "position": "課長補佐",
+                    "lastContactDate": "2024/4/22"
                   },
                   {
                     "id": "arai-ma",
                     "name": "新井 ま",
-                    "type": "person"
+                    "type": "person",
+                    "position": "",
+                    "lastContactDate": "2024/4/17"
                   }
                 ]
               }
@@ -56,7 +60,9 @@
                   {
                     "id": "shiohara-ma",
                     "name": "塩原 ま",
-                    "type": "person"
+                    "type": "person",
+                    "position": "副本部長",
+                    "lastContactDate": "2024/4/17"
                   }
                 ]
               },
@@ -68,7 +74,9 @@
                   {
                     "id": "sunagawa-ichi",
                     "name": "砂川 一",
-                    "type": "person"
+                    "type": "person",
+                    "position": "",
+                    "lastContactDate": "2022/4/12"
                   }
                 ]
               }
@@ -99,7 +107,9 @@
                   {
                     "id": "chiba-ha",
                     "name": "千葉 は",
-                    "type": "person"
+                    "type": "person",
+                    "position": "副本部長理事",
+                    "lastContactDate": "2022/3/1"
                   }
                 ]
               }
@@ -128,7 +138,9 @@
                   {
                     "id": "miyakawa-ki",
                     "name": "宮川 き",
-                    "type": "person"
+                    "type": "person",
+                    "position": "課長補佐",
+                    "lastContactDate": "2024/5/10"
                   }
                 ]
               }

@@ -3,6 +3,8 @@ let orgData = null;
 let expandedNodes = new Set();
 let highlightedNodes = new Set();
 let currentView = 'kddi'; // 現在のビュー: 'kddi', 'ctc'
+let filteredNodes = null; // 検索フィルター適用時のノードセット（nullの場合はフィルターなし）
+let searchActive = false; // 検索が有効かどうか
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -87,10 +89,16 @@ function renderTree(company, data) {
 
 // ノード描画（再帰）
 function renderNode(node, parentElement, company) {
+    const nodeId = `${company}-${node.id}`;
+
+    // 検索フィルターが有効な場合、フィルタードノードに含まれていないノードは表示しない
+    if (searchActive && filteredNodes && !filteredNodes.has(nodeId)) {
+        return;
+    }
+
     const nodeDiv = document.createElement('div');
     nodeDiv.className = 'tree-node';
 
-    const nodeId = `${company}-${node.id}`;
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = expandedNodes.has(nodeId);
     const isHighlighted = highlightedNodes.has(nodeId);
@@ -150,6 +158,9 @@ function setupEventListeners() {
     // 検索ボタン
     document.getElementById('search-button').addEventListener('click', performSearch);
 
+    // 検索解除ボタン
+    document.getElementById('clear-search-button').addEventListener('click', clearSearch);
+
     // Enterキーで検索
     document.getElementById('keyword-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -184,30 +195,36 @@ function performSearch() {
     const company = document.getElementById('company-select').value;
     const scope = document.getElementById('scope-select').value;
     const keyword = document.getElementById('keyword-input').value.trim();
-
-    if (!keyword) {
-        alert('検索キーワードを入力してください。');
-        return;
-    }
+    const position = document.getElementById('position-filter').value;
+    const dateFilter = document.getElementById('date-filter').value; // YYYY-MM形式
 
     // ハイライトクリア
     highlightedNodes.clear();
+    filteredNodes = new Set();
+    searchActive = true;
 
-    // 検索実行
-    const searchResults = searchNodes(company.toLowerCase(), scope, keyword);
+    // 検索実行（フィルター含む）
+    const searchResults = searchNodes(company.toLowerCase(), scope, keyword, position, dateFilter);
 
     if (searchResults.length === 0) {
         alert('該当する結果が見つかりませんでした。');
+        filteredNodes = null;
+        searchActive = false;
         return;
     }
 
-    // 検索結果に基づいて展開とハイライト
+    // 検索結果に基づいてフィルタードノードを設定
     searchResults.forEach(result => {
         highlightedNodes.add(result.nodeId);
+        filteredNodes.add(result.nodeId);
         expandPathToNode(result.nodeId, result.company);
 
-        // 対向組織の自動展開
-        expandCorrelatedNodes(result.nodeId, company.toLowerCase());
+        // パスの全ノードも表示対象に追加
+        const path = getNodePath(result.nodeId, result.company);
+        path.forEach(nodeId => filteredNodes.add(nodeId));
+
+        // 対向組織の相関ノードも追加
+        addCorrelatedNodesToFilter(result.nodeId, company.toLowerCase());
     });
 
     // ツリー再描画
@@ -217,20 +234,74 @@ function performSearch() {
     // コネクタ再描画
     setTimeout(() => drawConnectors(), 100);
 
+    // ヒートマップ再描画
+    setTimeout(() => renderHeatmap(), 150);
+
     // 最初の結果にスクロール
     scrollToNode(searchResults[0].nodeId);
 }
 
+// 検索解除
+function clearSearch() {
+    highlightedNodes.clear();
+    filteredNodes = null;
+    searchActive = false;
+
+    // フォームをクリア
+    document.getElementById('keyword-input').value = '';
+    document.getElementById('position-filter').value = '';
+    document.getElementById('date-filter').value = '';
+
+    // ツリー再描画
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+
+    // コネクタ再描画
+    setTimeout(() => drawConnectors(), 100);
+
+    // ヒートマップ再描画
+    setTimeout(() => renderHeatmap(), 150);
+}
+
 // ノード検索（階層が開いていなくても検索可能）
-function searchNodes(company, scope, keyword) {
+function searchNodes(company, scope, keyword, position, dateFilter) {
     const results = [];
     const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
 
     function search(nodes, prefix) {
         nodes.forEach(node => {
-            const matches =
-                (scope === 'department' && node.type !== 'person' && node.name.includes(keyword)) ||
-                (scope === 'person' && node.type === 'person' && node.name.includes(keyword));
+            let matches = false;
+
+            // キーワード検索
+            if (keyword) {
+                matches =
+                    (scope === 'department' && node.type !== 'person' && node.name.includes(keyword)) ||
+                    (scope === 'person' && node.type === 'person' && node.name.includes(keyword));
+            } else {
+                // キーワードがない場合は、個人ノードを対象とする（フィルターのみの場合）
+                matches = node.type === 'person';
+            }
+
+            // 役職フィルター（KDDIの個人のみ）
+            if (matches && node.type === 'person' && position && prefix === 'kddi') {
+                if (position === 'none') {
+                    matches = !node.position || node.position === '';
+                } else {
+                    matches = node.position === position;
+                }
+            }
+
+            // 最終接点日フィルター（KDDIの個人のみ）
+            if (matches && node.type === 'person' && dateFilter && prefix === 'kddi') {
+                if (node.lastContactDate) {
+                    const nodeDate = node.lastContactDate.substring(0, 7); // YYYY/MM -> YYYY/MM
+                    const filterDate = dateFilter; // YYYY-MM形式
+                    const nodeDateFormatted = nodeDate.replace('/', '-'); // YYYY/MM -> YYYY-MM
+                    matches = nodeDateFormatted >= filterDate;
+                } else {
+                    matches = false;
+                }
+            }
 
             if (matches) {
                 results.push({
@@ -320,6 +391,30 @@ function expandToPersonLevel(nodeId) {
 // 部レベルまで展開（KDDI側）
 function expandToDepartmentLevel(nodeId) {
     expandedNodes.add(nodeId);
+}
+
+// 相関ノードをフィルターに追加
+function addCorrelatedNodesToFilter(nodeId, searchCompany) {
+    const correlations = orgData.correlations || [];
+
+    correlations.forEach(corr => {
+        const kddiFull = `kddi-${corr.kddi}`;
+        const ctcFull = `ctc-${corr.ctc}`;
+
+        if (searchCompany === 'kddi' && nodeId === kddiFull) {
+            // KDDI視点: CTC側の相関ノードとそのパスを追加
+            filteredNodes.add(ctcFull);
+            const path = getNodePath(ctcFull, 'ctc');
+            path.forEach(id => filteredNodes.add(id));
+            expandPathToNode(ctcFull, 'ctc');
+        } else if (searchCompany === 'ctc' && nodeId === ctcFull) {
+            // CTC視点: KDDI側の相関ノードとそのパスを追加
+            filteredNodes.add(kddiFull);
+            const path = getNodePath(kddiFull, 'kddi');
+            path.forEach(id => filteredNodes.add(id));
+            expandPathToNode(kddiFull, 'kddi');
+        }
+    });
 }
 
 // ノードにスクロール

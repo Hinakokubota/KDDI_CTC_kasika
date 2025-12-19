@@ -32,7 +32,24 @@
                     <input type="text" id="keyword-input" placeholder="キーワードを入力...">
                 </div>
 
+                <div class="control-group">
+                    <label for="position-filter">役職:</label>
+                    <select id="position-filter">
+                        <option value="">すべて</option>
+                        <option value="副本部長理事">副本部長理事</option>
+                        <option value="副本部長">副本部長</option>
+                        <option value="課長補佐">課長補佐</option>
+                        <option value="none">役職なし</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="date-filter">接点日:</label>
+                    <input type="month" id="date-filter" placeholder="YYYY/MM">
+                </div>
+
                 <button id="search-button" class="search-btn">検索</button>
+                <button id="clear-search-button" class="clear-btn">検索解除</button>
 
                 <div class="view-toggle">
                     <button id="kddi-view-btn" class="view-btn active">KDDI View</button>

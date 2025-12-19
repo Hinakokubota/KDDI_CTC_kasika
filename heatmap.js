@@ -82,6 +82,12 @@ function getDisplayOrgs(data, company) {
     function traverse(nodes, level = 0, prefix = company) {
         nodes.forEach(node => {
             const nodeId = `${prefix}-${node.id}`;
+
+            // 検索フィルターが有効な場合、フィルタードノードに含まれていないノードは表示しない
+            if (searchActive && filteredNodes && !filteredNodes.has(nodeId)) {
+                return;
+            }
+
             const hasChildren = node.children && node.children.length > 0;
             const isExpanded = expanded.has(nodeId);
 

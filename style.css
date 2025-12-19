@@ -80,6 +80,23 @@ body {
     background: #357ABD;
 }
 
+.clear-btn {
+    padding: 8px 24px;
+    background: #999;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-left: 8px;
+}
+
+.clear-btn:hover {
+    background: #777;
+}
+
 .view-toggle {
     margin-left: auto;
     display: flex;
