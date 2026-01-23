@@ -243,6 +243,14 @@ body {
     flex: 1;
 }
 
+/* 個人View用のチェックボックス */
+.person-checkbox {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
 .node-children {
     margin-left: 30px;
     border-left: 2px solid #e9ecef;

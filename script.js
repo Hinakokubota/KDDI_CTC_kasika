@@ -2,9 +2,10 @@
 let orgData = null;
 let expandedNodes = new Set();
 let highlightedNodes = new Set();
-let currentView = 'kddi'; // 現在のビュー: 'kddi', 'ctc'
+let currentView = 'full'; // 現在のビュー: 'full', 'personal'
 let filteredNodes = null; // 検索フィルター適用時のノードセット（nullの場合はフィルターなし）
 let searchActive = false; // 検索が有効かどうか
+let selectedPersons = new Set(); // 個人Viewで選択された個人のSet
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -103,6 +104,13 @@ function renderNode(node, parentElement, company) {
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = expandedNodes.has(nodeId);
     const isHighlighted = highlightedNodes.has(nodeId);
+    const isPerson = node.type === 'person';
+    const isChecked = selectedPersons.has(nodeId);
+
+    // 個人Viewの場合、個人ノードにチェックボックスを表示
+    const checkboxHtml = (currentView === 'personal' && isPerson)
+        ? `<input type="checkbox" class="person-checkbox" data-person-id="${nodeId}" ${isChecked ? 'checked' : ''}>`
+        : '';
 
     nodeDiv.innerHTML = `
         <div class="node-content ${node.type} ${isHighlighted ? 'highlighted' : ''}"
@@ -111,6 +119,7 @@ function renderNode(node, parentElement, company) {
              data-type="${node.type}"
              data-name="${node.name}">
             ${hasChildren ? `<button class="expand-btn ${isExpanded ? 'expanded' : 'collapsed'}"></button>` : '<button class="expand-btn" disabled></button>'}
+            ${checkboxHtml}
             <div class="node-icon"></div>
             <div class="node-label">${node.name}</div>
         </div>
@@ -125,6 +134,23 @@ function renderNode(node, parentElement, company) {
             e.stopPropagation();
             toggleNode(nodeId);
         });
+    }
+
+    // チェックボックスのイベント（個人Viewの場合のみ）
+    if (currentView === 'personal' && isPerson) {
+        const checkbox = nodeDiv.querySelector('.person-checkbox');
+        if (checkbox) {
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                if (e.target.checked) {
+                    selectedPersons.add(nodeId);
+                } else {
+                    selectedPersons.delete(nodeId);
+                }
+                // コネクタ再描画
+                setTimeout(() => drawConnectors(), 10);
+            });
+        }
     }
 
     // 子ノード
@@ -170,8 +196,8 @@ function setupEventListeners() {
     });
 
     // ビュー切り替えボタン
-    document.getElementById('kddi-view-btn').addEventListener('click', () => switchView('kddi'));
-    document.getElementById('ctc-view-btn').addEventListener('click', () => switchView('ctc'));
+    document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
+    document.getElementById('personal-view-btn').addEventListener('click', () => switchView('personal'));
 
     // スクロールイベントでコネクタ再描画
     const kddTree = document.getElementById('kddi-tree');
@@ -516,17 +542,8 @@ function findVisibleParentNode(nodeId, company) {
 // コネクタ線描画
 function drawConnectors() {
     const svg = document.getElementById('connector-svg');
-    // 通常の矢印（右向き）と逆向きの矢印（左向き）の両方を定義
-    svg.innerHTML = `
-        <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#4A90E2" />
-            </marker>
-            <marker id="arrowhead-reverse" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
-                <polygon points="10 0, 0 3.5, 10 7" fill="#4A90E2" />
-            </marker>
-        </defs>
-    `;
+    // 矢印マーカーを削除し、線のみを描画
+    svg.innerHTML = '';
 
     const correlations = orgData.correlations || [];
 
@@ -534,13 +551,22 @@ function drawConnectors() {
         const kddiNodeId = `kddi-${corr.kddi}`;
         const ctcNodeId = `ctc-${corr.ctc}`;
 
-        // 個人ノードが表示されているか確認
-        const kddiPersonVisible = isPersonNodeVisible(kddiNodeId);
-        const ctcPersonVisible = isPersonNodeVisible(ctcNodeId);
+        let shouldDrawLine = false;
 
-        // 少なくとも片方の個人が表示されている場合のみコネクタを描画
-        if (!kddiPersonVisible && !ctcPersonVisible) {
-            return; // 両方とも個人が表示されていない場合は描画しない
+        if (currentView === 'full') {
+            // Full View: 個人ノードが表示されている場合に線を表示
+            const kddiPersonVisible = isPersonNodeVisible(kddiNodeId);
+            const ctcPersonVisible = isPersonNodeVisible(ctcNodeId);
+            shouldDrawLine = kddiPersonVisible && ctcPersonVisible;
+        } else if (currentView === 'personal') {
+            // 個人View: チェックされた個人の線のみを表示
+            const kddiChecked = selectedPersons.has(kddiNodeId);
+            const ctcChecked = selectedPersons.has(ctcNodeId);
+            shouldDrawLine = kddiChecked || ctcChecked;
+        }
+
+        if (!shouldDrawLine) {
+            return;
         }
 
         // 表示されているノード（または親ノード）を取得
@@ -552,16 +578,15 @@ function drawConnectors() {
             const ctcElement = document.querySelector(`[data-id="${ctcVisibleId}"]`);
 
             if (kddiElement && ctcElement) {
-                // 常にKDDIからCTCへの線を描画し、ビューによって矢印の向きを変更
-                const reverseArrow = currentView === 'ctc';
-                drawLine(kddiElement, ctcElement, svg, reverseArrow);
+                // 線のみを描画（矢印なし）
+                drawLine(kddiElement, ctcElement, svg);
             }
         }
     });
 }
 
-// 線描画
-function drawLine(fromElement, toElement, svg, reverse = false) {
+// 線描画（矢印なし）
+function drawLine(fromElement, toElement, svg) {
     const fromRect = fromElement.getBoundingClientRect();
     const toRect = toElement.getBoundingClientRect();
     const svgRect = svg.getBoundingClientRect();
@@ -581,15 +606,10 @@ function drawLine(fromElement, toElement, svg, reverse = false) {
     const d = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
     path.setAttribute('d', d);
     path.setAttribute('class', 'connector-line');
-
-    // 矢印の向きを制御
-    if (reverse) {
-        // CTC View: 始点（KDDI側）に逆向きの矢印を配置
-        path.setAttribute('marker-start', 'url(#arrowhead-reverse)');
-    } else {
-        // KDDI View: 終点（CTC側）に通常の矢印を配置
-        path.setAttribute('marker-end', 'url(#arrowhead)');
-    }
+    path.setAttribute('stroke', '#4A90E2');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    // 矢印マーカーは削除
 
     svg.appendChild(path);
 }
@@ -611,7 +631,7 @@ function switchView(view) {
     // 画面分割は常に1fr 1frで中央分割
     container.style.gridTemplateColumns = '1fr 1fr';
 
-    // ツリー再描画（ハイライトを解除するため）
+    // ツリー再描画（個人Viewの場合はチェックボックスを表示）
     renderTree('kddi', orgData.kddi);
     renderTree('ctc', orgData.ctc);
 
