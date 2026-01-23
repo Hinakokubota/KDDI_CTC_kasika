@@ -6,6 +6,7 @@ let currentView = 'full'; // 現在のビュー: 'full', 'personal'
 let filteredNodes = null; // 検索フィルター適用時のノードセット（nullの場合はフィルターなし）
 let searchActive = false; // 検索が有効かどうか
 let selectedPersons = new Set(); // 個人Viewで選択された個人のSet
+let connectedNodes = new Set(); // 線で接続されている相手のノードをハイライトするためのSet
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -106,14 +107,22 @@ function renderNode(node, parentElement, company) {
     const isHighlighted = highlightedNodes.has(nodeId);
     const isPerson = node.type === 'person';
     const isChecked = selectedPersons.has(nodeId);
+    const isConnected = connectedNodes.has(nodeId); // 接続先としてハイライト
+    const isDepartment = node.type && node.type !== 'person'; // 部署かどうか
 
-    // 個人Viewの場合、個人ノードにチェックボックスを表示
-    const checkboxHtml = (currentView === 'personal' && isPerson)
-        ? `<input type="checkbox" class="person-checkbox" data-person-id="${nodeId}" ${isChecked ? 'checked' : ''}>`
-        : '';
+    // 個人Viewの場合、個人ノードと部署ノードにチェックボックスを表示
+    let checkboxHtml = '';
+    if (currentView === 'personal') {
+        if (isPerson) {
+            checkboxHtml = `<input type="checkbox" class="person-checkbox" data-person-id="${nodeId}" ${isChecked ? 'checked' : ''}>`;
+        } else if (isDepartment && hasChildren) {
+            // 部署の場合もチェックボックスを表示（一括選択用）
+            checkboxHtml = `<input type="checkbox" class="department-checkbox" data-department-id="${nodeId}">`;
+        }
+    }
 
     nodeDiv.innerHTML = `
-        <div class="node-content ${node.type} ${isHighlighted ? 'highlighted' : ''}"
+        <div class="node-content ${node.type} ${isHighlighted ? 'highlighted' : ''} ${isConnected ? 'connected' : ''}"
              data-id="${nodeId}"
              data-company="${company}"
              data-type="${node.type}"
@@ -137,19 +146,38 @@ function renderNode(node, parentElement, company) {
     }
 
     // チェックボックスのイベント（個人Viewの場合のみ）
-    if (currentView === 'personal' && isPerson) {
-        const checkbox = nodeDiv.querySelector('.person-checkbox');
-        if (checkbox) {
-            checkbox.addEventListener('change', (e) => {
-                e.stopPropagation();
-                if (e.target.checked) {
-                    selectedPersons.add(nodeId);
-                } else {
-                    selectedPersons.delete(nodeId);
-                }
-                // コネクタ再描画
-                setTimeout(() => drawConnectors(), 10);
-            });
+    if (currentView === 'personal') {
+        if (isPerson) {
+            const checkbox = nodeDiv.querySelector('.person-checkbox');
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                        selectedPersons.add(nodeId);
+                    } else {
+                        selectedPersons.delete(nodeId);
+                    }
+                    // 接続先ノードのハイライトを更新
+                    updateConnectedNodesHighlight();
+                    // コネクタ再描画
+                    setTimeout(() => drawConnectors(), 10);
+                });
+            }
+        } else if (isDepartment && hasChildren) {
+            // 部署のチェックボックスのイベント
+            const checkbox = nodeDiv.querySelector('.department-checkbox');
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    const isChecked = e.target.checked;
+                    // 配下の全個人を選択/解除
+                    toggleDepartmentPersons(node, company, isChecked);
+                    // 接続先ノードのハイライトを更新
+                    updateConnectedNodesHighlight();
+                    // コネクタ再描画
+                    setTimeout(() => drawConnectors(), 10);
+                });
+            }
         }
     }
 
@@ -198,6 +226,10 @@ function setupEventListeners() {
     // ビュー切り替えボタン
     document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
     document.getElementById('personal-view-btn').addEventListener('click', () => switchView('personal'));
+
+    // 全選択/全解除ボタン
+    document.getElementById('select-all-btn').addEventListener('click', selectAllPersons);
+    document.getElementById('deselect-all-btn').addEventListener('click', deselectAllPersons);
 
     // スクロールイベントでコネクタ再描画
     const kddTree = document.getElementById('kddi-tree');
@@ -614,6 +646,110 @@ function drawLine(fromElement, toElement, svg) {
     svg.appendChild(path);
 }
 
+// 部署配下の全個人を選択/解除
+function toggleDepartmentPersons(departmentNode, company, isChecked) {
+    function selectPersonsRecursively(node) {
+        if (node.type === 'person') {
+            const personId = `${company}-${node.id}`;
+            if (isChecked) {
+                selectedPersons.add(personId);
+            } else {
+                selectedPersons.delete(personId);
+            }
+        }
+        if (node.children) {
+            node.children.forEach(child => selectPersonsRecursively(child));
+        }
+    }
+    selectPersonsRecursively(departmentNode);
+
+    // ツリー再描画
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+}
+
+// 全個人ノードを取得
+function getAllPersonNodes() {
+    const personNodes = [];
+
+    function collectPersons(nodes, company) {
+        nodes.forEach(node => {
+            if (node.type === 'person') {
+                personNodes.push(`${company}-${node.id}`);
+            }
+            if (node.children) {
+                collectPersons(node.children, company);
+            }
+        });
+    }
+
+    if (orgData.kddi.children) {
+        collectPersons(orgData.kddi.children, 'kddi');
+    }
+    if (orgData.ctc.children) {
+        collectPersons(orgData.ctc.children, 'ctc');
+    }
+
+    return personNodes;
+}
+
+// 全選択
+function selectAllPersons() {
+    const allPersons = getAllPersonNodes();
+    allPersons.forEach(personId => {
+        selectedPersons.add(personId);
+    });
+
+    // 接続先ノードのハイライトを更新
+    updateConnectedNodesHighlight();
+
+    // ツリー再描画
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+
+    // コネクタ再描画
+    setTimeout(() => drawConnectors(), 10);
+}
+
+// 全解除
+function deselectAllPersons() {
+    selectedPersons.clear();
+    connectedNodes.clear();
+
+    // ツリー再描画
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+
+    // コネクタ再描画（全て消える）
+    setTimeout(() => drawConnectors(), 10);
+}
+
+// 接続先ノードのハイライトを更新
+function updateConnectedNodesHighlight() {
+    connectedNodes.clear();
+
+    const correlations = orgData.correlations || [];
+
+    correlations.forEach(corr => {
+        const kddiNodeId = `kddi-${corr.kddi}`;
+        const ctcNodeId = `ctc-${corr.ctc}`;
+
+        // KDDI側が選択されている場合、CTC側をハイライト
+        if (selectedPersons.has(kddiNodeId)) {
+            connectedNodes.add(ctcNodeId);
+        }
+
+        // CTC側が選択されている場合、KDDI側をハイライト
+        if (selectedPersons.has(ctcNodeId)) {
+            connectedNodes.add(kddiNodeId);
+        }
+    });
+
+    // ツリー再描画
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+}
+
 // ビュー切り替え
 function switchView(view) {
     // 現在のビューを保存
@@ -627,9 +763,20 @@ function switchView(view) {
     document.getElementById(`${view}-view-btn`).classList.add('active');
 
     const container = document.querySelector('.org-container');
+    const selectionControls = document.getElementById('selection-controls');
 
     // 画面分割は常に1fr 1frで中央分割
     container.style.gridTemplateColumns = '1fr 1fr';
+
+    // 個人Viewの時は全選択/全解除ボタンを表示、それ以外は非表示
+    if (view === 'personal') {
+        selectionControls.style.display = 'block';
+        // デフォルトで全て未チェックにする
+        selectedPersons.clear();
+        connectedNodes.clear();
+    } else {
+        selectionControls.style.display = 'none';
+    }
 
     // ツリー再描画（個人Viewの場合はチェックボックスを表示）
     renderTree('kddi', orgData.kddi);
