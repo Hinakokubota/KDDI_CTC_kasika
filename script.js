@@ -554,10 +554,10 @@ function drawConnectors() {
         let shouldDrawLine = false;
 
         if (currentView === 'full') {
-            // Full View: 個人ノードが表示されている場合に線を表示
+            // Full View: 片方の個人ノードが表示されている場合に線を表示
             const kddiPersonVisible = isPersonNodeVisible(kddiNodeId);
             const ctcPersonVisible = isPersonNodeVisible(ctcNodeId);
-            shouldDrawLine = kddiPersonVisible && ctcPersonVisible;
+            shouldDrawLine = kddiPersonVisible || ctcPersonVisible;  // OR条件に変更
         } else if (currentView === 'personal') {
             // 個人View: チェックされた個人の線のみを表示
             const kddiChecked = selectedPersons.has(kddiNodeId);
