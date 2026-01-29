@@ -6,7 +6,6 @@ let currentView = 'full'; // 現在のビュー: 'full', 'personal'
 let filteredNodes = null; // 検索フィルター適用時のノードセット（nullの場合はフィルターなし）
 let searchActive = false; // 検索が有効かどうか
 let selectedPersons = new Set(); // 個人Viewで選択された個人のSet
-let connectedNodes = new Set(); // 線で接続されている相手のノードをハイライトするためのSet
 
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
@@ -89,6 +88,28 @@ function renderTree(company, data) {
     }
 }
 
+// 部署配下の全個人がチェックされているか確認
+function isDepartmentFullyChecked(node, company) {
+    let allChecked = true;
+    let hasPersons = false;
+
+    function checkRecursively(n) {
+        if (n.type === 'person') {
+            hasPersons = true;
+            const personId = `${company}-${n.id}`;
+            if (!selectedPersons.has(personId)) {
+                allChecked = false;
+            }
+        }
+        if (n.children) {
+            n.children.forEach(child => checkRecursively(child));
+        }
+    }
+
+    checkRecursively(node);
+    return hasPersons && allChecked;
+}
+
 // ノード描画（再帰）
 function renderNode(node, parentElement, company) {
     const nodeId = `${company}-${node.id}`;
@@ -107,7 +128,6 @@ function renderNode(node, parentElement, company) {
     const isHighlighted = highlightedNodes.has(nodeId);
     const isPerson = node.type === 'person';
     const isChecked = selectedPersons.has(nodeId);
-    const isConnected = connectedNodes.has(nodeId); // 接続先としてハイライト
     const isDepartment = node.type && node.type !== 'person'; // 部署かどうか
 
     // 個人Viewの場合、個人ノードと部署ノードにチェックボックスを表示
@@ -117,12 +137,14 @@ function renderNode(node, parentElement, company) {
             checkboxHtml = `<input type="checkbox" class="person-checkbox" data-person-id="${nodeId}" ${isChecked ? 'checked' : ''}>`;
         } else if (isDepartment && hasChildren) {
             // 部署の場合もチェックボックスを表示（一括選択用）
-            checkboxHtml = `<input type="checkbox" class="department-checkbox" data-department-id="${nodeId}">`;
+            // 配下の全個人がチェックされている場合はチェック状態にする
+            const isDeptChecked = isDepartmentFullyChecked(node, company);
+            checkboxHtml = `<input type="checkbox" class="department-checkbox" data-department-id="${nodeId}" ${isDeptChecked ? 'checked' : ''}>`;
         }
     }
 
     nodeDiv.innerHTML = `
-        <div class="node-content ${node.type} ${isHighlighted ? 'highlighted' : ''} ${isConnected ? 'connected' : ''}"
+        <div class="node-content ${node.type} ${isHighlighted ? 'highlighted' : ''}"
              data-id="${nodeId}"
              data-company="${company}"
              data-type="${node.type}"
@@ -157,8 +179,9 @@ function renderNode(node, parentElement, company) {
                     } else {
                         selectedPersons.delete(nodeId);
                     }
-                    // 接続先ノードのハイライトを更新
-                    updateConnectedNodesHighlight();
+                    // ツリー再描画（部署のチェックボックス状態を更新）
+                    renderTree('kddi', orgData.kddi);
+                    renderTree('ctc', orgData.ctc);
                     // コネクタ再描画
                     setTimeout(() => drawConnectors(), 10);
                 });
@@ -172,8 +195,6 @@ function renderNode(node, parentElement, company) {
                     const isChecked = e.target.checked;
                     // 配下の全個人を選択/解除
                     toggleDepartmentPersons(node, company, isChecked);
-                    // 接続先ノードのハイライトを更新
-                    updateConnectedNodesHighlight();
                     // コネクタ再描画
                     setTimeout(() => drawConnectors(), 10);
                 });
@@ -700,9 +721,6 @@ function selectAllPersons() {
         selectedPersons.add(personId);
     });
 
-    // 接続先ノードのハイライトを更新
-    updateConnectedNodesHighlight();
-
     // ツリー再描画
     renderTree('kddi', orgData.kddi);
     renderTree('ctc', orgData.ctc);
@@ -714,7 +732,6 @@ function selectAllPersons() {
 // 全解除
 function deselectAllPersons() {
     selectedPersons.clear();
-    connectedNodes.clear();
 
     // ツリー再描画
     renderTree('kddi', orgData.kddi);
@@ -722,32 +739,6 @@ function deselectAllPersons() {
 
     // コネクタ再描画（全て消える）
     setTimeout(() => drawConnectors(), 10);
-}
-
-// 接続先ノードのハイライトを更新
-function updateConnectedNodesHighlight() {
-    connectedNodes.clear();
-
-    const correlations = orgData.correlations || [];
-
-    correlations.forEach(corr => {
-        const kddiNodeId = `kddi-${corr.kddi}`;
-        const ctcNodeId = `ctc-${corr.ctc}`;
-
-        // KDDI側が選択されている場合、CTC側をハイライト
-        if (selectedPersons.has(kddiNodeId)) {
-            connectedNodes.add(ctcNodeId);
-        }
-
-        // CTC側が選択されている場合、KDDI側をハイライト
-        if (selectedPersons.has(ctcNodeId)) {
-            connectedNodes.add(kddiNodeId);
-        }
-    });
-
-    // ツリー再描画
-    renderTree('kddi', orgData.kddi);
-    renderTree('ctc', orgData.ctc);
 }
 
 // ビュー切り替え
@@ -773,7 +764,6 @@ function switchView(view) {
         selectionControls.style.display = 'block';
         // デフォルトで全て未チェックにする
         selectedPersons.clear();
-        connectedNodes.clear();
     } else {
         selectionControls.style.display = 'none';
     }
