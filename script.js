@@ -234,8 +234,9 @@ function setupEventListeners() {
     // 検索ボタン
     document.getElementById('search-button').addEventListener('click', performSearch);
 
-    // 検索解除ボタン
+    // 検索解除ボタン（条件クリアと× 検索解除）
     document.getElementById('clear-search-button').addEventListener('click', clearSearch);
+    document.getElementById('cancel-search-button').addEventListener('click', clearSearch);
 
     // Enterキーで検索
     document.getElementById('keyword-input').addEventListener('keypress', (e) => {
@@ -247,10 +248,6 @@ function setupEventListeners() {
     // ビュー切り替えボタン
     document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
     document.getElementById('personal-view-btn').addEventListener('click', () => switchView('personal'));
-
-    // 全選択/全解除ボタン
-    document.getElementById('select-all-btn').addEventListener('click', selectAllPersons);
-    document.getElementById('deselect-all-btn').addEventListener('click', deselectAllPersons);
 
     // スクロールイベントでコネクタ再描画
     const kddTree = document.getElementById('kddi-tree');
@@ -276,7 +273,19 @@ function performSearch() {
     const scope = document.getElementById('scope-select').value;
     const keyword = document.getElementById('keyword-input').value.trim();
     const position = document.getElementById('position-filter').value;
-    const dateFilter = document.getElementById('date-filter').value; // YYYY-MM形式
+
+    // 期間フィルターをYYYY-MM形式に変換
+    const datePeriod = document.getElementById('date-filter').value;
+    let dateFilter = '';
+    if (datePeriod) {
+        const now = new Date();
+        if (datePeriod === '1year')   now.setFullYear(now.getFullYear() - 1);
+        if (datePeriod === '6months') now.setMonth(now.getMonth() - 6);
+        if (datePeriod === '3months') now.setMonth(now.getMonth() - 3);
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        dateFilter = `${y}-${m}`;
+    }
 
     // ハイライトクリア
     highlightedNodes.clear();
@@ -714,6 +723,40 @@ function getAllPersonNodes() {
     return personNodes;
 }
 
+// パネル単位の全選択
+function selectAllPersonsInPanel(company) {
+    const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
+    function collectPersons(nodes) {
+        nodes.forEach(node => {
+            if (node.type === 'person') {
+                selectedPersons.add(`${company}-${node.id}`);
+            }
+            if (node.children) collectPersons(node.children);
+        });
+    }
+    if (data.children) collectPersons(data.children);
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+    setTimeout(() => drawConnectors(), 10);
+}
+
+// パネル単位の全解除
+function deselectAllPersonsInPanel(company) {
+    const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
+    function removePersons(nodes) {
+        nodes.forEach(node => {
+            if (node.type === 'person') {
+                selectedPersons.delete(`${company}-${node.id}`);
+            }
+            if (node.children) removePersons(node.children);
+        });
+    }
+    if (data.children) removePersons(data.children);
+    renderTree('kddi', orgData.kddi);
+    renderTree('ctc', orgData.ctc);
+    setTimeout(() => drawConnectors(), 10);
+}
+
 // 全選択
 function selectAllPersons() {
     const allPersons = getAllPersonNodes();
@@ -754,18 +797,21 @@ function switchView(view) {
     document.getElementById(`${view}-view-btn`).classList.add('active');
 
     const container = document.querySelector('.org-container');
-    const selectionControls = document.getElementById('selection-controls');
 
     // 画面分割は常に1fr 1frで中央分割
     container.style.gridTemplateColumns = '1fr 1fr';
 
-    // 個人Viewの時は全選択/全解除ボタンを表示、それ以外は非表示
+    // 個人Viewの時はパネル内の全選択/全解除ボタンを表示、それ以外は非表示
+    const kddiActions = document.getElementById('kddi-panel-actions');
+    const ctcActions = document.getElementById('ctc-panel-actions');
     if (view === 'personal') {
-        selectionControls.style.display = 'block';
+        kddiActions.style.display = 'flex';
+        ctcActions.style.display = 'flex';
         // デフォルトで全て未チェックにする
         selectedPersons.clear();
     } else {
-        selectionControls.style.display = 'none';
+        kddiActions.style.display = 'none';
+        ctcActions.style.display = 'none';
     }
 
     // ツリー再描画（個人Viewの場合はチェックボックスを表示）

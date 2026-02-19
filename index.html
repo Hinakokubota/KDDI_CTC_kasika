@@ -8,62 +8,65 @@
 </head>
 <body>
     <div class="container">
-        <!-- ヘッダーエリア: 検索・フィルタリング機能 -->
+        <!-- ヘッダー -->
         <header class="header">
             <h1>KDDI-CTC 組織構造</h1>
-            <div class="search-controls">
-                <div class="control-group">
-                    <label for="company-select">会社名:</label>
-                    <select id="company-select">
-                        <option value="KDDI">KDDI</option>
-                        <option value="CTC">CTC</option>
+            <div class="view-toggle">
+                <button id="full-view-btn" class="view-btn active">組織全体 (Full)</button>
+                <button id="personal-view-btn" class="view-btn">担当者連携 (Connect)</button>
+            </div>
+        </header>
+
+        <!-- フィルターエリア -->
+        <div class="filter-area">
+            <!-- 絞り込みフィルター行 -->
+            <div class="filter-row">
+                <span class="filter-label">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h14M3 8h10M6 13h4" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    絞り込みフィルター:
+                </span>
+                <div class="filter-group">
+                    <span class="filter-icon">📅</span>
+                    <label for="date-filter">期間：</label>
+                    <select id="date-filter" class="filter-select">
+                        <option value="">全期間</option>
+                        <option value="1year" selected>1年以内</option>
+                        <option value="6months">6ヶ月以内</option>
+                        <option value="3months">3ヶ月以内</option>
                     </select>
                 </div>
-
-                <div class="control-group">
-                    <label for="scope-select">検索対象:</label>
-                    <select id="scope-select">
-                        <option value="department">部署</option>
-                        <option value="person">個人名</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <input type="text" id="keyword-input" placeholder="キーワードを入力...">
-                </div>
-
-                <div class="control-group">
-                    <label for="position-filter">役職:</label>
-                    <select id="position-filter">
-                        <option value="">すべて</option>
+                <div class="filter-group">
+                    <span class="filter-icon">👤</span>
+                    <label for="position-filter">役職：</label>
+                    <select id="position-filter" class="filter-select">
+                        <option value="">全て</option>
                         <option value="副本部長理事">副本部長理事</option>
                         <option value="副本部長">副本部長</option>
                         <option value="課長補佐">課長補佐</option>
                         <option value="none">役職なし</option>
                     </select>
                 </div>
-
-                <div class="control-group">
-                    <label for="date-filter">接点日:</label>
-                    <input type="month" id="date-filter" placeholder="YYYY/MM">
-                </div>
-
-                <div class="search-actions">
-                    <button id="search-button" class="search-btn">検索</button>
-                    <button id="clear-search-button" class="search-btn clear-btn">検索解除</button>
-                </div>
-
-                <div class="view-toggle">
-                    <button id="full-view-btn" class="view-btn active">Full View</button>
-                    <button id="personal-view-btn" class="view-btn">個人View</button>
-                </div>
-
-                <div class="selection-controls" id="selection-controls" style="display: none;">
-                    <button id="select-all-btn" class="selection-btn">全選択</button>
-                    <button id="deselect-all-btn" class="selection-btn">全解除</button>
-                </div>
+                <button id="clear-search-button" class="clear-link">条件クリア</button>
             </div>
-        </header>
+
+            <!-- キーワード検索行 -->
+            <div class="search-row">
+                <span class="search-label">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="6.5" r="5" stroke="#555" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="#555" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    キーワード検索:
+                </span>
+                <div class="search-input-wrap">
+                    <input type="text" id="keyword-input" class="search-input" placeholder="部署・氏名を入力...">
+                    <!-- 検索対象（hidden） -->
+                    <input type="hidden" id="scope-select" value="department">
+                    <input type="hidden" id="company-select" value="KDDI">
+                </div>
+                <button id="cancel-search-button" class="cancel-btn">
+                    <span>×</span> 検索解除
+                </button>
+                <button id="search-button" class="search-btn">検索</button>
+            </div>
+        </div>
 
         <!-- メインエリア: 組織図表示 -->
         <main class="main-area">
@@ -71,7 +74,13 @@
                 <!-- 左ペイン: KDDI組織図 -->
                 <div class="org-panel kddi-panel">
                     <div class="panel-header">
-                        <h2>KDDI <span class="default-note">(Default: Headquarters)</span></h2>
+                        <div class="panel-title">
+                            <h2>KDDI <span class="default-note">(Default: Headquarters)</span></h2>
+                        </div>
+                        <div class="panel-actions" id="kddi-panel-actions" style="display: none;">
+                            <button class="panel-select-btn select-all" onclick="selectAllPersonsInPanel('kddi')">全選択</button>
+                            <button class="panel-select-btn deselect-all" onclick="deselectAllPersonsInPanel('kddi')">全解除</button>
+                        </div>
                     </div>
                     <div id="kddi-tree" class="org-tree"></div>
                 </div>
@@ -83,7 +92,13 @@
                 <!-- 右ペイン: CTC組織図 -->
                 <div class="org-panel ctc-panel">
                     <div class="panel-header">
-                        <h2>CTC <span class="default-note">(Default: Department)</span></h2>
+                        <div class="panel-title">
+                            <h2>CTC <span class="default-note">(Default: Department)</span></h2>
+                        </div>
+                        <div class="panel-actions" id="ctc-panel-actions" style="display: none;">
+                            <button class="panel-select-btn select-all" onclick="selectAllPersonsInPanel('ctc')">全選択</button>
+                            <button class="panel-select-btn deselect-all" onclick="deselectAllPersonsInPanel('ctc')">全解除</button>
+                        </div>
                     </div>
                     <div id="ctc-tree" class="org-tree"></div>
                 </div>
