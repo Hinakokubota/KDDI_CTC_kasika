@@ -6,80 +6,76 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
+    background: #ECEEF1;
     min-height: 100vh;
 }
 
 .container {
     max-width: 1600px;
     margin: 0 auto;
-    background: #f0f2f5;
+    background: #ECEEF1;
 }
 
 /* ヘッダー */
 .header {
-    background: #1a2f5e;
+    background: rgb(14, 13, 106);
     color: white;
-    padding: 16px 28px;
+    padding: 18px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
 .header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
 }
 
 /* ビュー切り替えボタン */
 .view-toggle {
     display: flex;
-    gap: 0;
-    background: rgba(255,255,255,0.15);
-    border-radius: 8px;
-    padding: 3px;
+    gap: 8px;
 }
 
 .view-btn {
-    padding: 8px 20px;
+    padding: 8px 22px;
     background: transparent;
-    color: rgba(255,255,255,0.75);
-    border: none;
+    color: white;
+    border: 1.5px solid rgba(255,255,255,0.5);
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: all 0.2s;
     white-space: nowrap;
 }
 
 .view-btn:hover {
-    color: white;
-    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.8);
 }
 
 .view-btn.active {
-    background: #4A90E2;
+    background: #5B9FED;
+    border-color: #5B9FED;
     color: white;
-    font-weight: 700;
 }
 
 /* フィルターエリア */
 .filter-area {
     background: white;
-    margin: 16px 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin: 18px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow: hidden;
 }
 
 .filter-row {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px 20px;
-    border-bottom: 1px solid #eef0f3;
+    gap: 18px;
+    padding: 14px 24px;
+    border-bottom: 1px solid #E5E7EB;
     flex-wrap: wrap;
 }
 
@@ -139,8 +135,8 @@ body {
 .search-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
+    gap: 14px;
+    padding: 14px 24px;
     flex-wrap: wrap;
 }
 
@@ -202,25 +198,25 @@ body {
 }
 
 .search-btn {
-    padding: 9px 24px;
-    background: #4A90E2;
+    padding: 9px 28px;
+    background: #5B9FED;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
     white-space: nowrap;
 }
 
 .search-btn:hover {
-    background: #357ABD;
+    background: #4A8FDD;
 }
 
 /* メインエリア */
 .main-area {
-    padding: 0 20px 20px;
+    padding: 0 24px 24px;
 }
 
 .org-container {
@@ -234,9 +230,9 @@ body {
 /* 組織図パネル */
 .org-panel {
     background: white;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow-y: auto;
     max-height: 720px;
 }
@@ -245,8 +241,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px 12px;
-    border-bottom: 1px solid #eef0f3;
+    padding: 14px 20px 13px;
+    border-bottom: 1px solid #E5E7EB;
     position: sticky;
     top: 0;
     background: white;
@@ -254,9 +250,9 @@ body {
 }
 
 .panel-title h2 {
-    font-size: 16px;
-    color: #1a2f5e;
-    font-weight: 700;
+    font-size: 15px;
+    color: #2D3748;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -275,36 +271,36 @@ body {
 }
 
 .panel-select-btn {
-    padding: 5px 12px;
+    padding: 6px 14px;
     border: none;
     border-radius: 5px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .panel-select-btn.select-all {
-    background: #27ae60;
+    background: #5CB85C;
     color: white;
 }
 
 .panel-select-btn.select-all:hover {
-    background: #229954;
+    background: #4CAE4C;
 }
 
 .panel-select-btn.deselect-all {
-    background: #e74c3c;
+    background: #D9534F;
     color: white;
 }
 
 .panel-select-btn.deselect-all:hover {
-    background: #c0392b;
+    background: #C9302C;
 }
 
 /* 組織ツリー */
 .org-tree {
-    padding: 12px 14px;
+    padding: 14px 16px;
 }
 
 .tree-node {
@@ -348,7 +344,7 @@ body {
     height: 20px;
     min-width: 20px;
     border: none;
-    background: #4A90E2;
+    background: #5B9FED;
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -363,7 +359,7 @@ body {
 }
 
 .expand-btn:hover {
-    background: #357ABD;
+    background: #4A8FDD;
 }
 
 .expand-btn.collapsed::before {
@@ -387,7 +383,7 @@ body {
     width: 15px;
     height: 15px;
     flex-shrink: 0;
-    accent-color: #4A90E2;
+    accent-color: #5B9FED;
 }
 
 /* ノードアイコン */
@@ -445,7 +441,7 @@ body {
 }
 
 .connector-line {
-    stroke: #4A90E2;
+    stroke: #5B9FED;
     stroke-width: 2;
     fill: none;
     opacity: 0;
@@ -466,17 +462,17 @@ body {
 /* ヒートマップセクション */
 .heatmap-section {
     background: white;
-    margin: 0 20px 20px;
+    margin: 0 24px 24px;
     padding: 28px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .heatmap-title {
     font-size: 20px;
-    color: #1a2f5e;
+    color: #2D3748;
     margin-bottom: 16px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .heatmap-controls {
