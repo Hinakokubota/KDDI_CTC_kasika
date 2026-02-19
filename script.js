@@ -668,7 +668,7 @@ function drawLine(fromElement, toElement, svg) {
     const d = `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
     path.setAttribute('d', d);
     path.setAttribute('class', 'connector-line');
-    path.setAttribute('stroke', '#5B9FED');
+    path.setAttribute('stroke', 'rgb(0, 92, 202)');
     path.setAttribute('stroke-width', '2');
     path.setAttribute('fill', 'none');
     // 矢印マーカーは削除
