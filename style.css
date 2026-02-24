@@ -48,12 +48,6 @@ body {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 12px rgba(14,13,106,0.06);
-  width: 100%;
-}
-
-.header-inner {
-  max-width: 1600px;
-  margin: 0 auto;
   padding: 0 40px;
   height: 60px;
   display: flex;
@@ -139,9 +133,8 @@ body {
 .filter-area {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 14px 14px;
-  margin: 0 0 22px 0;
+  border-radius: 14px;
+  margin: 16px 0 10px 0;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(14,13,106,0.06);
