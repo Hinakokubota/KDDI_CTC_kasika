@@ -322,7 +322,7 @@ input[type="text"]:focus {
 
 /* ═══ Main Area ═══ */
 .main-area {
-  padding: 0 40px 48px;
+  padding: 0 24px 48px;
 }
 
 .org-container {
@@ -331,7 +331,7 @@ input[type="text"]:focus {
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   align-items: start;
-  min-height: 600px;
+  min-height: 1200px;
 }
 
 /* ═══ Panels ═══ */
@@ -441,7 +441,7 @@ input[type="text"]:focus {
 /* ═══ Organization Tree ═══ */
 .org-tree {
   padding: 14px 18px 18px;
-  max-height: 500px;
+  max-height: 1000px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
@@ -671,7 +671,7 @@ input[type="text"]:focus {
 .heatmap-container {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 520px;
+  max-height: 1040px;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
 }
