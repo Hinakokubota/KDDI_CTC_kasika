@@ -61,6 +61,47 @@ function expandToLevel(nodes, targetType, prefix) {
     });
 }
 
+// ノードタイプに対応するSVGアイコンを返す
+function getNodeSvgIcon(type, company) {
+    const isKddi = company === 'kddi';
+    const primaryColor = isKddi ? 'var(--kddi)' : 'var(--ctc)';
+
+    // 建物アイコン（headquarters / department）
+    const buildingIcon = `<svg class="node-svg-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" style="color:${primaryColor}">
+        <rect x="1.5" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M5 14V9.5h5V14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 5.5h1.5M4 8h1.5M9.5 5.5H11M9.5 8H11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M1.5 5H13.5" stroke="currentColor" stroke-width="1.3"/>
+    </svg>`;
+
+    // 部署アイコン（本部レベル）
+    const deptIcon = `<svg class="node-svg-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:${primaryColor}">
+        <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`;
+
+    // 課アイコン（薄い色）
+    const sectionIcon = `<svg class="node-svg-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-muted); opacity:0.7">
+        <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`;
+
+    // 個人アイコン
+    const personIcon = `<svg class="node-svg-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-muted); opacity:0.6">
+        <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>`;
+
+    switch (type) {
+        case 'headquarters':    return buildingIcon;
+        case 'department':      return buildingIcon;
+        case 'section':         return sectionIcon;
+        case 'person':          return personIcon;
+        case 'business-group':  return deptIcon;
+        default:                return buildingIcon;
+    }
+}
+
 // ツリー描画
 function renderTree(company, data) {
     const container = document.getElementById(`${company}-tree`);
@@ -71,7 +112,7 @@ function renderTree(company, data) {
     rootDiv.className = 'tree-node';
     rootDiv.innerHTML = `
         <div class="node-content headquarters" data-id="${company}-root">
-            <div class="node-icon"></div>
+            ${getNodeSvgIcon('headquarters', company)}
             <div class="node-label">${data.name}</div>
         </div>
     `;
@@ -151,7 +192,7 @@ function renderNode(node, parentElement, company) {
              data-name="${node.name}">
             ${hasChildren ? `<button class="expand-btn ${isExpanded ? 'expanded' : 'collapsed'}"></button>` : '<button class="expand-btn" disabled></button>'}
             ${checkboxHtml}
-            <div class="node-icon"></div>
+            ${getNodeSvgIcon(node.type, company)}
             <div class="node-label">${node.name}</div>
         </div>
     `;
