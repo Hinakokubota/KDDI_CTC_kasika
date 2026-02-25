@@ -624,17 +624,17 @@ function addCorrelatedNodesToFilter(nodeId, searchCompany) {
         const ctcFull = `ctc-${corr.ctc}`;
 
         if (searchCompany === 'kddi' && nodeId === kddiFull) {
-            // KDDI視点: CTC側の相関ノードとそのパスを追加
+            // KDDI視点: CTC側の相関ノードとそのパスを追加（展開はしない）
             filteredNodes.add(ctcFull);
             const path = getNodePath(ctcFull, 'ctc');
             path.forEach(id => filteredNodes.add(id));
-            expandPathToNode(ctcFull, 'ctc');
+            // expandPathToNode(ctcFull, 'ctc'); // 削除: コネクション先は折りたたんだまま
         } else if (searchCompany === 'ctc' && nodeId === ctcFull) {
-            // CTC視点: KDDI側の相関ノードとそのパスを追加
+            // CTC視点: KDDI側の相関ノードとそのパスを追加（展開はしない）
             filteredNodes.add(kddiFull);
             const path = getNodePath(kddiFull, 'kddi');
             path.forEach(id => filteredNodes.add(id));
-            expandPathToNode(kddiFull, 'kddi');
+            // expandPathToNode(kddiFull, 'kddi'); // 削除: コネクション先は折りたたんだまま
         }
     });
 }
