@@ -33,15 +33,11 @@ function initializeApp() {
     // CTC: 部（department）まで展開
     expandToLevel(orgData.ctc.children, 'department', 'ctc');
 
-    // ツリー描画
-    renderTree('kddi', orgData.kddi);
-    renderTree('ctc', orgData.ctc);
-
     // イベントリスナー設定
     setupEventListeners();
 
-    // コネクタ線描画
-    setTimeout(() => drawConnectors(), 100);
+    // currentView に合わせてビューを初期化（ボタン・チェックボックス・コネクタを正しく設定）
+    switchView(currentView);
 
     // ヒートマップ初期化
     setTimeout(() => initializeHeatmap(), 150);
