@@ -273,34 +273,48 @@ function toggleNode(nodeId) {
 // イベントリスナー設定
 function setupEventListeners() {
     // 検索ボタン
-    document.getElementById('search-button').addEventListener('click', performSearch);
+    const searchBtn = document.getElementById('search-button');
+    if (searchBtn) searchBtn.addEventListener('click', performSearch);
 
     // 検索解除ボタン（条件クリアと× 検索解除）
-    document.getElementById('clear-search-button').addEventListener('click', clearSearch);
-    document.getElementById('cancel-search-button').addEventListener('click', clearSearch);
+    const clearSearchBtn = document.getElementById('clear-search-button');
+    if (clearSearchBtn) clearSearchBtn.addEventListener('click', clearSearch);
+
+    const cancelSearchBtn = document.getElementById('cancel-search-button');
+    if (cancelSearchBtn) cancelSearchBtn.addEventListener('click', clearSearch);
 
     // Enterキーで検索
-    document.getElementById('keyword-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
+    const keywordInput = document.getElementById('keyword-input');
+    if (keywordInput) {
+        keywordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
 
     // ビュー切り替えボタン
-    document.getElementById('full-view-btn').addEventListener('click', () => switchView('full'));
-    document.getElementById('personal-view-btn').addEventListener('click', () => switchView('personal'));
+    const fullViewBtn = document.getElementById('full-view-btn');
+    if (fullViewBtn) fullViewBtn.addEventListener('click', () => switchView('full'));
+
+    const personalViewBtn = document.getElementById('personal-view-btn');
+    if (personalViewBtn) personalViewBtn.addEventListener('click', () => switchView('personal'));
 
     // スクロールイベントでコネクタ再描画
     const kddTree = document.getElementById('kddi-tree');
     const ctcTree = document.getElementById('ctc-tree');
 
-    kddTree.parentElement.addEventListener('scroll', () => {
-        drawConnectors();
-    });
+    if (kddTree && kddTree.parentElement) {
+        kddTree.parentElement.addEventListener('scroll', () => {
+            drawConnectors();
+        });
+    }
 
-    ctcTree.parentElement.addEventListener('scroll', () => {
-        drawConnectors();
-    });
+    if (ctcTree && ctcTree.parentElement) {
+        ctcTree.parentElement.addEventListener('scroll', () => {
+            drawConnectors();
+        });
+    }
 
     // ウィンドウリサイズ時にコネクタ再描画
     window.addEventListener('resize', () => {
@@ -310,13 +324,19 @@ function setupEventListeners() {
 
 // 検索実行
 function performSearch() {
-    const company = document.getElementById('company-select').value;
-    const scope = document.getElementById('scope-select').value;
-    const keyword = document.getElementById('keyword-input').value.trim();
-    const position = document.getElementById('position-filter').value;
+    const companyEl = document.getElementById('company-select');
+    const scopeEl = document.getElementById('scope-select');
+    const keywordEl = document.getElementById('keyword-input');
+    const positionEl = document.getElementById('position-filter');
+    const dateEl = document.getElementById('date-filter');
+
+    const company = companyEl ? companyEl.value : 'KDDI';
+    const scope = scopeEl ? scopeEl.value : 'department';
+    const keyword = keywordEl ? keywordEl.value.trim() : '';
+    const position = positionEl ? positionEl.value : '';
 
     // 期間フィルターをYYYY-MM形式に変換
-    const datePeriod = document.getElementById('date-filter').value;
+    const datePeriod = dateEl ? dateEl.value : '';
     let dateFilter = '';
     if (datePeriod) {
         const now = new Date();
