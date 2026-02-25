@@ -18,14 +18,17 @@
                 </div>
                 <h1 class="header-title">KDDI-CTC 組織構造</h1>
             </div>
+            <!-- ▼▼▼ ビュー切替ボタン（Full復活時はコメント解除・active付け替え）▼▼▼ -->
             <div class="view-toggle">
-                <button id="full-view-btn" class="view-btn active">組織全体 (Full)</button>
-                <button id="personal-view-btn" class="view-btn">担当者連携 (Connect)</button>
+                <!-- <button id="full-view-btn" class="view-btn">組織全体 (Full)</button> -->
+                <button id="full-view-btn" class="view-btn" style="display:none;"></button>
+                <button id="personal-view-btn" class="view-btn active">担当者連携 (Connect)</button>
             </div>
+            <!-- ▲▲▲ ビュー切替ボタン ここまで -->
         </header>
         <!-- フィルターエリア -->
         <div class="filter-area">
-            <!-- 絞り込みフィルター行 -->
+            <!-- ▼▼▼ 絞り込みフィルター行（データ準備後に復活予定 - コメントアウト中）▼▼▼
             <div class="filter-row">
                 <span class="filter-label">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 2h10M3 6h6M5 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -56,6 +59,7 @@
                 </div>
                 <button id="clear-search-button" class="clear-link">条件クリア</button>
             </div>
+            ▲▲▲ 絞り込みフィルター行 ここまで -->
 
             <!-- キーワード検索行 -->
             <div class="search-row">

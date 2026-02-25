@@ -331,7 +331,7 @@ input[type="text"]:focus {
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   align-items: start;
-  min-height: 1200px;
+  min-height: 1000px;
 }
 
 /* ═══ Panels ═══ */
@@ -342,6 +342,9 @@ input[type="text"]:focus {
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(14,13,106,0.05);
   animation: fadeUp 0.38s ease both;
+  height: 1000px;
+  display: flex;
+  flex-direction: column;
 }
 
 .org-panel:nth-child(2) {
@@ -363,7 +366,7 @@ input[type="text"]:focus {
   align-items: center;
   justify-content: space-between;
   position: sticky;
-  top: 60px;
+  top: 10px;
   background: var(--surface);
   z-index: 10;
 }
@@ -441,7 +444,7 @@ input[type="text"]:focus {
 /* ═══ Organization Tree ═══ */
 .org-tree {
   padding: 14px 18px 18px;
-  max-height: 1000px;
+  flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;

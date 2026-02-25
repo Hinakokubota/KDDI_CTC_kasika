@@ -2,7 +2,7 @@
 let orgData = null;
 let expandedNodes = new Set();
 let highlightedNodes = new Set();
-let currentView = 'full'; // 現在のビュー: 'full', 'personal'
+let currentView = 'personal'; // 現在のビュー: 'full', 'personal'  ※ 'full' に変更するとFull画面で起動
 let filteredNodes = null; // 検索フィルター適用時のノードセット（nullの場合はフィルターなし）
 let searchActive = false; // 検索が有効かどうか
 let selectedPersons = new Set(); // 個人Viewで選択された個人のSet
