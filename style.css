@@ -476,6 +476,23 @@ input[type="text"]:focus {
   background: #fff3cd;
   border: 1.5px solid #ffc107;
   font-weight: 600;
+  animation: highlightFade 2s ease-out forwards;
+}
+
+@keyframes highlightFade {
+  0% {
+    background: #fff3cd;
+    border-color: #ffc107;
+  }
+  70% {
+    background: #fff3cd;
+    border-color: #ffc107;
+  }
+  100% {
+    background: transparent;
+    border-color: var(--border);
+    font-weight: normal;
+  }
 }
 
 .node-content.person {

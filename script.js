@@ -260,6 +260,18 @@ function toggleNode(nodeId) {
         expandedNodes.delete(nodeId);
     } else {
         expandedNodes.add(nodeId);
+
+        // 検索アクティブ時：展開したノードの全子ノードをフィルターに追加
+        if (searchActive && filteredNodes) {
+            const [company, ...idParts] = nodeId.split('-');
+            const id = idParts.join('-');
+            const data = company === 'kddi' ? orgData.kddi : orgData.ctc;
+            const node = findNodeById(data, id);
+
+            if (node && node.children) {
+                addAllChildrenToFilter(node.children, company);
+            }
+        }
     }
 
     // ツリー再描画
@@ -268,6 +280,39 @@ function toggleNode(nodeId) {
 
     // コネクタ再描画
     setTimeout(() => drawConnectors(), 100);
+}
+
+// ノードIDでノードを検索
+function findNodeById(data, targetId) {
+    function search(nodes) {
+        for (let node of nodes) {
+            if (node.id === targetId) {
+                return node;
+            }
+            if (node.children) {
+                const found = search(node.children);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    if (data.children) {
+        return search(data.children);
+    }
+    return null;
+}
+
+// 全子ノードをフィルターに追加（再帰）
+function addAllChildrenToFilter(children, company) {
+    children.forEach(child => {
+        const childId = `${company}-${child.id}`;
+        filteredNodes.add(childId);
+
+        if (child.children) {
+            addAllChildrenToFilter(child.children, company);
+        }
+    });
 }
 
 // イベントリスナー設定
@@ -442,14 +487,14 @@ function searchNodes(company, scope, keyword, position, dateFilter) {
             // キーワード検索
             if (keyword) {
                 if (scope === 'both') {
-                    // 組織名と担当者名の両方を検索
-                    matches = node.name.includes(keyword);
+                    // 組織名と担当者名の両方を検索（大文字小文字を区別しない）
+                    matches = node.name && node.name.toLowerCase().includes(keyword.toLowerCase());
                 } else if (scope === 'department') {
                     // 組織名のみ
-                    matches = node.type !== 'person' && node.name.includes(keyword);
+                    matches = node.type !== 'person' && node.name && node.name.toLowerCase().includes(keyword.toLowerCase());
                 } else if (scope === 'person') {
                     // 担当者名のみ
-                    matches = node.type === 'person' && node.name.includes(keyword);
+                    matches = node.type === 'person' && node.name && node.name.toLowerCase().includes(keyword.toLowerCase());
                 }
             } else {
                 // キーワードがない場合は、個人ノードを対象とする（フィルターのみの場合）
