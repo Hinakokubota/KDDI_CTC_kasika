@@ -17,10 +17,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadData() {
     try {
         const response = await fetch('data.json?t=' + new Date().getTime());
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         orgData = await response.json();
+        console.log('データ読み込み成功:', orgData);
     } catch (error) {
         console.error('データの読み込みに失敗しました:', error);
-        alert('データの読み込みに失敗しました。');
+        alert('データの読み込みに失敗しました: ' + error.message);
     }
 }
 
