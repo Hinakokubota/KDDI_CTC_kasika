@@ -256,6 +256,9 @@ function renderNode(node, parentElement, company) {
 
 // ノードの展開/折りたたみ
 function toggleNode(nodeId) {
+    // ハイライトをクリア（ユーザーアクションで消す）
+    highlightedNodes.clear();
+
     if (expandedNodes.has(nodeId)) {
         expandedNodes.delete(nodeId);
     } else {
