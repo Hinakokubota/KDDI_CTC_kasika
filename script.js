@@ -402,8 +402,9 @@ function performSearch() {
         dateFilter = `${y}-${m}`;
     }
 
-    // ハイライトクリア
+    // ハイライトとコネクトをクリア
     highlightedNodes.clear();
+    selectedPersons.clear(); // 検索時に既存のコネクトをクリア
     filteredNodes = new Set();
     searchActive = true;
 
