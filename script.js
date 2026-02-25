@@ -304,14 +304,14 @@ function setupEventListeners() {
     const kddTree = document.getElementById('kddi-tree');
     const ctcTree = document.getElementById('ctc-tree');
 
-    if (kddTree && kddTree.parentElement) {
-        kddTree.parentElement.addEventListener('scroll', () => {
+    if (kddTree) {
+        kddTree.addEventListener('scroll', () => {
             drawConnectors();
         });
     }
 
-    if (ctcTree && ctcTree.parentElement) {
-        ctcTree.parentElement.addEventListener('scroll', () => {
+    if (ctcTree) {
+        ctcTree.addEventListener('scroll', () => {
             drawConnectors();
         });
     }
@@ -330,10 +330,16 @@ function performSearch() {
     const positionEl = document.getElementById('position-filter');
     const dateEl = document.getElementById('date-filter');
 
-    const company = companyEl ? companyEl.value : 'KDDI';
-    const scope = scopeEl ? scopeEl.value : 'department';
+    const company = companyEl ? companyEl.value : 'both'; // 両社を検索
+    const scope = scopeEl ? scopeEl.value : 'both'; // 組織と担当者の両方
     const keyword = keywordEl ? keywordEl.value.trim() : '';
     const position = positionEl ? positionEl.value : '';
+
+    // キーワードがない場合は検索しない
+    if (!keyword) {
+        alert('検索キーワードを入力してください。');
+        return;
+    }
 
     // 期間フィルターをYYYY-MM形式に変換
     const datePeriod = dateEl ? dateEl.value : '';
@@ -353,8 +359,10 @@ function performSearch() {
     filteredNodes = new Set();
     searchActive = true;
 
-    // 検索実行（フィルター含む）
-    const searchResults = searchNodes(company.toLowerCase(), scope, keyword, position, dateFilter);
+    // 両社を検索（KDDI と CTC）
+    const kddResults = searchNodes('kddi', scope, keyword, position, dateFilter);
+    const ctcResults = searchNodes('ctc', scope, keyword, position, dateFilter);
+    const searchResults = [...kddResults, ...ctcResults];
 
     if (searchResults.length === 0) {
         alert('該当する結果が見つかりませんでした。');
@@ -374,7 +382,7 @@ function performSearch() {
         path.forEach(nodeId => filteredNodes.add(nodeId));
 
         // 対向組織の相関ノードも追加
-        addCorrelatedNodesToFilter(result.nodeId, company.toLowerCase());
+        addCorrelatedNodesToFilter(result.nodeId, result.company);
     });
 
     console.log('検索結果:', searchResults.length, '件');
@@ -401,10 +409,15 @@ function clearSearch() {
     filteredNodes = null;
     searchActive = false;
 
-    // フォームをクリア
-    document.getElementById('keyword-input').value = '';
-    document.getElementById('position-filter').value = '';
-    document.getElementById('date-filter').value = '';
+    // フォームをクリア（存在する要素のみ）
+    const keywordInput = document.getElementById('keyword-input');
+    if (keywordInput) keywordInput.value = '';
+
+    const positionFilter = document.getElementById('position-filter');
+    if (positionFilter) positionFilter.value = '';
+
+    const dateFilter = document.getElementById('date-filter');
+    if (dateFilter) dateFilter.value = '';
 
     // ツリー再描画
     renderTree('kddi', orgData.kddi);
@@ -428,9 +441,16 @@ function searchNodes(company, scope, keyword, position, dateFilter) {
 
             // キーワード検索
             if (keyword) {
-                matches =
-                    (scope === 'department' && node.type !== 'person' && node.name.includes(keyword)) ||
-                    (scope === 'person' && node.type === 'person' && node.name.includes(keyword));
+                if (scope === 'both') {
+                    // 組織名と担当者名の両方を検索
+                    matches = node.name.includes(keyword);
+                } else if (scope === 'department') {
+                    // 組織名のみ
+                    matches = node.type !== 'person' && node.name.includes(keyword);
+                } else if (scope === 'person') {
+                    // 担当者名のみ
+                    matches = node.type === 'person' && node.name.includes(keyword);
+                }
             } else {
                 // キーワードがない場合は、個人ノードを対象とする（フィルターのみの場合）
                 matches = node.type === 'person';
