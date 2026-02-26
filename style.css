@@ -1,7 +1,7 @@
 :root {
-  --kddi:       #E60012;
-  --kddi-light: rgba(230, 0, 18, 0.07);
-  --kddi-mid:   rgba(230, 0, 18, 0.18);
+  --kddi:       rgb(14, 13, 106);
+  --kddi-light: rgba(14, 13, 106, 0.07);
+  --kddi-mid:   rgba(14, 13, 106, 0.18);
   --ctc:        rgb(0, 92, 202);
   --ctc-light:  rgba(0, 92, 202, 0.07);
   --ctc-mid:    rgba(0, 92, 202, 0.18);
@@ -674,6 +674,8 @@ input[type="text"]:focus {
   gap: 5px;
   font-size: 0.7rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .legend-color {

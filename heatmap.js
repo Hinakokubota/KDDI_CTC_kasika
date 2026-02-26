@@ -237,7 +237,7 @@ function renderHeatmap() {
         // KDDIのヘッダーは背景白、文字色はtypeに応じて変更
         rowHeader.style.backgroundColor = '#ffffff';
         if (kddiOrg.type === 'headquarters') {
-            rowHeader.style.color = '#E60012'; // KDDIコーポレートカラー（赤）
+            rowHeader.style.color = 'rgb(14, 13, 106)'; // KDDIコーポレートカラー
         } else if (kddiOrg.type === 'department') {
             rowHeader.style.color = '#000000'; // 黒
         } else if (kddiOrg.type === 'section') {
