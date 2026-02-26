@@ -234,15 +234,9 @@ function renderHeatmap() {
 
         rowHeader.innerHTML = `${indent}${toggle}${kddiOrg.name}${label}`;
 
-        // KDDIのヘッダーは背景白、文字色はtypeに応じて変更
-        rowHeader.style.backgroundColor = '#ffffff';
-        if (kddiOrg.type === 'headquarters') {
-            rowHeader.style.color = 'rgb(14, 13, 106)'; // KDDIコーポレートカラー
-        } else if (kddiOrg.type === 'department') {
-            rowHeader.style.color = '#000000'; // 黒
-        } else if (kddiOrg.type === 'section') {
-            rowHeader.style.color = '#666666'; // 薄い黒（グレー）
-        }
+        // KDDIのヘッダーは全て同じ背景色（KDDIコーポレートカラー）、文字色は白
+        rowHeader.style.backgroundColor = 'rgb(14, 13, 106)'; // KDDIコーポレートカラー
+        rowHeader.style.color = '#ffffff'; // 白文字
 
         // 階層の境界線を追加: headquartersが変わるときのみ太い線
         if (rowIndex > 0 && kddiOrg.type === 'headquarters') {

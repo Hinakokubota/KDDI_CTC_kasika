@@ -738,7 +738,7 @@ input[type="text"]:focus {
 }
 
 .heatmap-cell.row-header {
-  background: #ffffff !important;
+  background: #ffffff;
   text-align: left;
   position: sticky;
   left: 0;
