@@ -7,6 +7,20 @@ let filteredNodes = null; // 検索フィルター適用時のノードセット
 let searchActive = false; // 検索が有効かどうか
 let selectedPersons = new Set(); // 個人Viewで選択された個人のSet
 
+// CTC側のsectionの表示順序（本番データ用）
+const CTC_SECTION_ORDER = [
+    '情報通信第２本部付き',
+    '通信キャリア営業第１部',
+    '通信キャリア営業第２部',
+    '通信キャリア営業第３部',
+    'テックビジネスリード部',
+    'ＴＸリード第１部',
+    'ＴＸリード第２部',
+    'ＴＸリード第３部',
+    'ＯＸリード部',
+    'ＤＸリード部'
+];
+
 // 初期化
 document.addEventListener('DOMContentLoaded', async () => {
     await loadData();
@@ -59,6 +73,37 @@ function expandToLevel(nodes, targetType, prefix) {
             }
         }
     });
+}
+
+// CTC側のsectionを指定された順番でソート
+function sortCTCSections(children, company) {
+    if (company !== 'ctc') return children;
+
+    // section（課）のみをソート対象とする
+    const sections = children.filter(child => child.type === 'section');
+    const nonSections = children.filter(child => child.type !== 'section');
+
+    if (sections.length === 0) return children;
+
+    // 指定された順番でソート
+    const sortedSections = sections.sort((a, b) => {
+        const indexA = CTC_SECTION_ORDER.indexOf(a.name);
+        const indexB = CTC_SECTION_ORDER.indexOf(b.name);
+
+        // 両方とも順序リストにある場合
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+        }
+        // aのみ順序リストにある場合、aを前に
+        if (indexA !== -1) return -1;
+        // bのみ順序リストにある場合、bを前に
+        if (indexB !== -1) return 1;
+        // 両方とも順序リストにない場合、元の順序を維持
+        return 0;
+    });
+
+    // section以外のノードと結合（sectionを先に配置）
+    return [...sortedSections, ...nonSections];
 }
 
 // ノードタイプに対応するSVGアイコンを返す
@@ -122,7 +167,9 @@ function renderTree(company, data) {
     if (data.children) {
         const childrenDiv = document.createElement('div');
         childrenDiv.className = 'node-children';
-        data.children.forEach(child => {
+        // CTC側のsectionをソート
+        const sortedChildren = sortCTCSections(data.children, company);
+        sortedChildren.forEach(child => {
             renderNode(child, childrenDiv, company);
         });
         rootDiv.appendChild(childrenDiv);
@@ -247,7 +294,9 @@ function renderNode(node, parentElement, company) {
     if (hasChildren) {
         const childrenDiv = document.createElement('div');
         childrenDiv.className = `node-children ${isExpanded ? '' : 'collapsed'}`;
-        node.children.forEach(child => {
+        // CTC側のsectionをソート
+        const sortedChildren = sortCTCSections(node.children, company);
+        sortedChildren.forEach(child => {
             renderNode(child, childrenDiv, company);
         });
         nodeDiv.appendChild(childrenDiv);
