@@ -1,7 +1,7 @@
 :root {
-  --kddi:       rgb(14, 13, 106);
-  --kddi-light: rgba(14, 13, 106, 0.07);
-  --kddi-mid:   rgba(14, 13, 106, 0.18);
+  --kddi:       #E60012;
+  --kddi-light: rgba(230, 0, 18, 0.07);
+  --kddi-mid:   rgba(230, 0, 18, 0.18);
   --ctc:        rgb(0, 92, 202);
   --ctc-light:  rgba(0, 92, 202, 0.07);
   --ctc-mid:    rgba(0, 92, 202, 0.18);
@@ -630,10 +630,10 @@ input[type="text"]:focus {
 .heatmap-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 18px 24px 14px;
   border-bottom: 1px solid var(--border);
-  gap: 20px;
+  gap: 32px;
 }
 
 .heatmap-title {
@@ -853,12 +853,6 @@ input[type="text"]:focus {
 
 .heatmap-cell.parent-org {
   font-weight: 700;
-  background: var(--surface2) !important;
-  color: var(--kddi);
-}
-
-.heatmap-cell.row-header.parent-org {
-  background: var(--surface2) !important;
 }
 
 .sum-label {

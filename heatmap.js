@@ -4,8 +4,8 @@ let heatmapExpandedCTC = new Set();
 
 // ヒートマップ初期化
 function initializeHeatmap() {
-    // KDDI: 課（section）まで展開
-    expandToHeatmapLevel(orgData.kddi.children, 'section', 'kddi');
+    // KDDI: 初期状態では全て折りたたみ、本部（headquarters）のみ表示
+    // expandToHeatmapLevel(orgData.kddi.children, 'section', 'kddi');
     // CTC: 課（section）のみ表示（展開なし）
     // CTCは個人を含まず、sectionのみを表示
 
@@ -68,15 +68,15 @@ function calculateConnections(kddiNode, ctcNode) {
 function getHeatColor(count) {
     if (count === 0) return '#F4F6FA';
     if (count <= 10) return 'rgba(0,92,202,0.12)';
-    if (count <= 20) return 'rgba(0,92,202,0.30)';
-    if (count <= 30) return 'rgba(0,92,202,0.55)';
+    if (count <= 50) return 'rgba(0,92,202,0.30)';
+    if (count <= 100) return 'rgba(0,92,202,0.55)';
     return 'rgb(14,13,106)';
 }
 
 // 件数に基づいて文字色を取得
 function getHeatTextColor(count) {
-    // 21件以上は白文字
-    if (count > 20) return '#ffffff';
+    // 50件以上は白文字
+    if (count > 50) return '#ffffff';
     return 'inherit';
 }
 
@@ -122,7 +122,8 @@ function getDisplayOrgs(data, company) {
                 type: node.type,
                 level: level,
                 // KDDIのみ展開ボタンを表示、CTCは展開ボタンなし
-                hasChildren: company === 'kddi' && hasChildren,
+                // sectionは最下層なので展開ボタンを表示しない
+                hasChildren: company === 'kddi' && hasChildren && node.type !== 'section',
                 isExpanded: company === 'kddi' && isExpanded,
                 node: node
             });
@@ -235,7 +236,9 @@ function renderHeatmap() {
 
         // KDDIのヘッダーは背景白、文字色はtypeに応じて変更
         rowHeader.style.backgroundColor = '#ffffff';
-        if (kddiOrg.type === 'headquarters' || kddiOrg.type === 'department') {
+        if (kddiOrg.type === 'headquarters') {
+            rowHeader.style.color = '#E60012'; // KDDIコーポレートカラー（赤）
+        } else if (kddiOrg.type === 'department') {
             rowHeader.style.color = '#000000'; // 黒
         } else if (kddiOrg.type === 'section') {
             rowHeader.style.color = '#666666'; // 薄い黒（グレー）
