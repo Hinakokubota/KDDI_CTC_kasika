@@ -45,7 +45,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--surface);
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 12px rgba(14,13,106,0.06);
   padding: 0 40px;
