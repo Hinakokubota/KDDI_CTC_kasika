@@ -159,6 +159,15 @@ function renderHeatmap() {
     cornerCell.textContent = 'KDDI \\ CTC';
     headerRow.appendChild(cornerCell);
 
+    // 合計列のヘッダー
+    const totalHeaderCell = document.createElement('div');
+    totalHeaderCell.className = 'heatmap-cell header col-header total-header';
+    totalHeaderCell.textContent = '合計';
+    totalHeaderCell.title = 'KDDI組織ごとの全CTC組織との接続件数合計';
+    totalHeaderCell.style.fontWeight = '700';
+    totalHeaderCell.style.backgroundColor = '#f8f9fa';
+    headerRow.appendChild(totalHeaderCell);
+
     // CTC組織名（列ヘッダー）
     ctcOrgs.forEach((org, index) => {
         const cell = document.createElement('div');
@@ -219,14 +228,30 @@ function renderHeatmap() {
 
         rowHeader.innerHTML = `${indent}${toggle}${kddiOrg.name}${label}`;
 
-        // 階層の境界線を追加
-        if (rowIndex > 0 && kddiOrg.level === 0) {
+        // 階層の境界線を追加: headquartersが変わるときのみ太い線
+        if (rowIndex > 0 && kddiOrg.type === 'headquarters') {
             row.style.borderTop = '3px solid #666';
-        } else if (rowIndex > 0 && kddiOrg.level < kddiOrgs[rowIndex - 1].level) {
-            row.style.borderTop = '2px solid #999';
         }
 
         row.appendChild(rowHeader);
+
+        // 合計列を追加（KDDI組織の全CTCとのコネクション合計）
+        const totalCell = document.createElement('div');
+        totalCell.className = 'heatmap-cell total-cell';
+
+        // 全CTCとのコネクション数を計算
+        let totalCount = 0;
+        ctcOrgs.forEach(ctcOrg => {
+            totalCount += calculateConnections(kddiOrg.node, ctcOrg.node);
+        });
+
+        totalCell.style.backgroundColor = getHeatColor(totalCount);
+        totalCell.style.color = getHeatTextColor(totalCount);
+        totalCell.textContent = totalCount > 0 ? totalCount : '';
+        totalCell.style.fontWeight = '700';
+        totalCell.title = `${kddiOrg.name} の合計接続件数: ${totalCount}件`;
+
+        row.appendChild(totalCell);
 
         // データセル
         ctcOrgs.forEach((ctcOrg, colIndex) => {
