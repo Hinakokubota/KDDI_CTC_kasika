@@ -21,7 +21,7 @@
 
 body {
   font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg);
+  background: #ffffff;
   color: var(--text);
   min-height: 100vh;
 }
@@ -29,7 +29,7 @@ body {
 .container {
   max-width: 1600px;
   margin: 0 auto;
-  background: #ffffff;
+  background: var(--bg);
   padding-top: 0;
 }
 
