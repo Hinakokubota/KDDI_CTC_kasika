@@ -4,11 +4,10 @@ let heatmapExpandedCTC = new Set();
 
 // ヒートマップ初期化
 function initializeHeatmap() {
-    // デフォルトで本部/部レベルまで展開
-    // KDDI: 本部（headquarters）まで展開
-    expandToHeatmapLevel(orgData.kddi.children, 'headquarters', 'kddi');
-    // CTC: 部（department）まで展開
-    expandToHeatmapLevel(orgData.ctc.children, 'department', 'ctc');
+    // KDDI: 部（department）まで展開
+    expandToHeatmapLevel(orgData.kddi.children, 'department', 'kddi');
+    // CTC: 課（section）のみ表示（展開なし）
+    // CTCは個人を含まず、sectionのみを表示
 
     renderHeatmap();
 }
@@ -67,11 +66,18 @@ function calculateConnections(kddiNode, ctcNode) {
 
 // 件数に基づいて色を取得
 function getHeatColor(count) {
-    if (count === 0) return '#f0f0f0';
-    if (count <= 2) return '#cfe2f3';
-    if (count <= 5) return '#6fa8dc';
-    if (count <= 10) return '#3c78d8';
-    return '#1155cc';
+    if (count === 0) return '#F4F6FA';
+    if (count <= 10) return 'rgba(0,92,202,0.12)';
+    if (count <= 20) return 'rgba(0,92,202,0.30)';
+    if (count <= 30) return 'rgba(0,92,202,0.55)';
+    return 'rgb(14,13,106)';
+}
+
+// 件数に基づいて文字色を取得
+function getHeatTextColor(count) {
+    // 21件以上は白文字
+    if (count > 20) return '#ffffff';
+    return 'inherit';
 }
 
 // 表示する組織リストを取得
@@ -88,6 +94,25 @@ function getDisplayOrgs(data, company) {
                 return;
             }
 
+            // ヒートマップでは個人を表示しない
+            if (node.type === 'person') {
+                return;
+            }
+
+            // KDDIの場合: headquarters と department のみ表示
+            if (company === 'kddi' && node.type !== 'headquarters' && node.type !== 'department') {
+                return;
+            }
+
+            // CTCの場合: section のみ表示
+            if (company === 'ctc' && node.type !== 'section') {
+                // CTCはsectionのみなので、子要素があっても展開せずsectionだけ取得
+                if (node.children) {
+                    traverse(node.children, level, prefix);
+                }
+                return;
+            }
+
             const hasChildren = node.children && node.children.length > 0;
             const isExpanded = expanded.has(nodeId);
 
@@ -96,12 +121,13 @@ function getDisplayOrgs(data, company) {
                 name: node.name,
                 type: node.type,
                 level: level,
-                hasChildren: hasChildren,
-                isExpanded: isExpanded,
+                hasChildren: false, // ヒートマップでは展開ボタンを表示しない
+                isExpanded: false,
                 node: node
             });
 
-            if (hasChildren && isExpanded) {
+            // KDDIの場合のみ子要素を展開
+            if (company === 'kddi' && hasChildren && isExpanded) {
                 traverse(node.children, level + 1, prefix);
             }
         });
@@ -221,6 +247,7 @@ function renderHeatmap() {
 
             const count = calculateConnections(kddiOrg.node, ctcOrg.node);
             cell.style.backgroundColor = getHeatColor(count);
+            cell.style.color = getHeatTextColor(count);
             cell.textContent = count > 0 ? count : '';
 
             // データ属性

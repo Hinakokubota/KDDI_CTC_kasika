@@ -636,7 +636,7 @@ input[type="text"]:focus {
 }
 
 .heatmap-controls {
-  display: none;
+  display: flex;
 }
 
 .legend {
@@ -745,9 +745,11 @@ input[type="text"]:focus {
   top: 0;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  padding: 12px 8px;
+  padding: 16px 10px;
   min-width: 60px;
-  max-height: 130px;
+  height: auto;
+  max-height: none;
+  white-space: normal;
 }
 
 .heatmap-cell:not(.header):not(.row-header):hover {
