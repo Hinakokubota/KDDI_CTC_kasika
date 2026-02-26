@@ -630,7 +630,7 @@ input[type="text"]:focus {
 .heatmap-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 18px 24px 14px;
   border-bottom: 1px solid var(--border);
   gap: 32px;
