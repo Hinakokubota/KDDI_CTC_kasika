@@ -4,8 +4,8 @@ let heatmapExpandedCTC = new Set();
 
 // ヒートマップ初期化
 function initializeHeatmap() {
-    // KDDI: 部（department）まで展開
-    expandToHeatmapLevel(orgData.kddi.children, 'department', 'kddi');
+    // KDDI: 課（section）まで展開
+    expandToHeatmapLevel(orgData.kddi.children, 'section', 'kddi');
     // CTC: 課（section）のみ表示（展開なし）
     // CTCは個人を含まず、sectionのみを表示
 
@@ -99,8 +99,8 @@ function getDisplayOrgs(data, company) {
                 return;
             }
 
-            // KDDIの場合: headquarters と department のみ表示
-            if (company === 'kddi' && node.type !== 'headquarters' && node.type !== 'department') {
+            // KDDIの場合: headquarters, department, section を表示
+            if (company === 'kddi' && node.type !== 'headquarters' && node.type !== 'department' && node.type !== 'section') {
                 return;
             }
 
@@ -121,8 +121,9 @@ function getDisplayOrgs(data, company) {
                 name: node.name,
                 type: node.type,
                 level: level,
-                hasChildren: false, // ヒートマップでは展開ボタンを表示しない
-                isExpanded: false,
+                // KDDIのみ展開ボタンを表示、CTCは展開ボタンなし
+                hasChildren: company === 'kddi' && hasChildren,
+                isExpanded: company === 'kddi' && isExpanded,
                 node: node
             });
 
@@ -183,12 +184,7 @@ function renderHeatmap() {
         cell.innerHTML = `${indent}${toggle}${org.name}${label}`;
         cell.title = org.name + (org.hasChildren && org.isExpanded ? ' (下位階層の合計)' : '');
 
-        // 階層の境界線を追加（新しい親組織の開始位置）
-        if (index > 0 && org.level === 0) {
-            cell.style.borderLeft = '3px solid #666';
-        } else if (index > 0 && org.level < ctcOrgs[index - 1].level) {
-            cell.style.borderLeft = '2px solid #999';
-        }
+        // CTCのヘッダーは境界線を追加しない（太字枠線なし）
 
         headerRow.appendChild(cell);
     });

@@ -635,18 +635,21 @@ input[type="text"]:focus {
   border-bottom: 1px solid var(--border);
 }
 
-.heatmap-controls {
-  display: flex;
-}
-
-.legend {
+/* 凡例を表の右上に配置 */
+.heatmap-legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
-  padding: 14px 24px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  max-width: 500px;
 }
 
 .legend-label {
@@ -672,6 +675,7 @@ input[type="text"]:focus {
 }
 
 .heatmap-container {
+  position: relative;
   overflow-x: auto;
   overflow-y: auto;
   max-height: 1040px;
@@ -714,16 +718,16 @@ input[type="text"]:focus {
 }
 
 .heatmap-cell.header {
-  background: var(--surface2);
+  background: #ffffff;
   font-weight: 600;
   position: sticky;
   z-index: 10;
-  color: var(--text);
+  color: #000000;
   font-size: 0.72rem;
 }
 
 .heatmap-cell.row-header {
-  background: var(--surface) !important;
+  background: #ffffff !important;
   text-align: left;
   position: sticky;
   left: 0;
@@ -732,11 +736,12 @@ input[type="text"]:focus {
   padding: 8px 14px;
   font-size: 0.8rem;
   font-weight: 500;
+  color: #000000;
 }
 
 .heatmap-cell.corner {
   z-index: 15;
-  background: var(--surface);
+  background: #ffffff;
   border-right: 2px solid var(--border2);
   border-bottom: 2px solid var(--border2);
 }
