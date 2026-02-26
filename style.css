@@ -657,7 +657,7 @@ input[type="text"]:focus {
 .heatmap-legend {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
   flex-wrap: nowrap;
 }
 
