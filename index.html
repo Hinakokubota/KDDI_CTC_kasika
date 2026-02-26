@@ -122,9 +122,11 @@
 
         <!-- ヒートマップエリア -->
         <section class="heatmap-section">
-            <h2 class="heatmap-title">KDDI・CTC 組織相関ヒートマップ</h2>
-            <div class="heatmap-container">
-                <!-- 凡例を表の右上に配置 -->
+            <div class="heatmap-header">
+                <h2 class="heatmap-title">
+                    <span class="kddi-color">KDDI</span>×<span class="ctc-color">CTC</span> 組織相関ヒートマップ
+                </h2>
+                <!-- 凡例をタイトルの横に配置 -->
                 <div class="heatmap-legend">
                     <span class="legend-label">接続件数:</span>
                     <div class="legend-item">
@@ -150,6 +152,8 @@
                         </span>
                     </div>
                 </div>
+            </div>
+            <div class="heatmap-container">
                 <div id="heatmap-grid"></div>
             </div>
         </section>

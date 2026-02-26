@@ -157,6 +157,8 @@ function renderHeatmap() {
     const cornerCell = document.createElement('div');
     cornerCell.className = 'heatmap-cell header row-header corner';
     cornerCell.textContent = 'KDDI \\ CTC';
+    cornerCell.style.backgroundColor = '#ffffff';
+    cornerCell.style.color = '#000000';
     headerRow.appendChild(cornerCell);
 
     // 合計列のヘッダー
@@ -165,7 +167,8 @@ function renderHeatmap() {
     totalHeaderCell.textContent = '合計';
     totalHeaderCell.title = 'KDDI組織ごとの全CTC組織との接続件数合計';
     totalHeaderCell.style.fontWeight = '700';
-    totalHeaderCell.style.backgroundColor = '#f8f9fa';
+    totalHeaderCell.style.backgroundColor = '#ffffff';
+    totalHeaderCell.style.color = '#000000';
     headerRow.appendChild(totalHeaderCell);
 
     // CTC組織名（列ヘッダー）
@@ -193,7 +196,9 @@ function renderHeatmap() {
         cell.innerHTML = `${indent}${toggle}${org.name}${label}`;
         cell.title = org.name + (org.hasChildren && org.isExpanded ? ' (下位階層の合計)' : '');
 
-        // CTCのヘッダーは境界線を追加しない（太字枠線なし）
+        // CTCのヘッダーは背景白、文字黒
+        cell.style.backgroundColor = '#ffffff';
+        cell.style.color = '#000000';
 
         headerRow.appendChild(cell);
     });
@@ -227,6 +232,14 @@ function renderHeatmap() {
         const label = (kddiOrg.hasChildren && kddiOrg.isExpanded) ? ' <span class="sum-label">(合計)</span>' : '';
 
         rowHeader.innerHTML = `${indent}${toggle}${kddiOrg.name}${label}`;
+
+        // KDDIのヘッダーは背景白、文字色はtypeに応じて変更
+        rowHeader.style.backgroundColor = '#ffffff';
+        if (kddiOrg.type === 'headquarters' || kddiOrg.type === 'department') {
+            rowHeader.style.color = '#000000'; // 黒
+        } else if (kddiOrg.type === 'section') {
+            rowHeader.style.color = '#666666'; // 薄い黒（グレー）
+        }
 
         // 階層の境界線を追加: headquartersが変わるときのみ太い線
         if (rowIndex > 0 && kddiOrg.type === 'headquarters') {
